@@ -1,0 +1,28 @@
+{
+  "name": "net25-kurs-2-fullstack-alaa-alsous",
+  "version": "1.0.0",
+  "description": "[![Review Assignment Due Date](https://classroom.github.com/assets/deadline-readme-button-22041afd0340ce965d47ae6ef1cefeee28c7c493a6346c4f15d667ab976d596c.svg)](https://classroom.github.com/a/2XOSb5hU)\r # .NET25: Fullstack",
+  "main": "server.js",
+  "scripts": {
+    "start": "nodemon server.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/EduEdugrade/net25-kurs-2-fullstack-alaa-alsous.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "bugs": {
+    "url": "https://github.com/EduEdugrade/net25-kurs-2-fullstack-alaa-alsous/issues"
+  },
+  "homepage": "https://github.com/EduEdugrade/net25-kurs-2-fullstack-alaa-alsous#readme",
+  "dependencies": {
+    "express": "^5.2.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.11"
+  }
+}
