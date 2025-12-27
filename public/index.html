@@ -3,13 +3,37 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title></title>
+    <title>TaskTrack</title>
     <link rel="stylesheet" href="styles.css" />
-    <script src="script.js" defer></script>
+    <script src="index.js" defer></script>
   </head>
   <body>
-    <header></header>
-    <main></main>
-    <footer></footer>
+    <header><h1>Task Track</h1></header>
+    <main>
+      <section id="task-input">
+        <div>
+          <label for="new-task">New Task:</label>
+          <input type="text" id="new-task" placeholder="Add new task..." />
+        </div>
+        <div>
+          <label for="priority">Priority:</label>
+          <select id="priority">
+            <option value="low">Low</option>
+            <option value="medium">Medium</option>
+            <option value="high">High</option>
+          </select>
+        </div>
+        <div>
+          <label for="due-date">Due Date:</label>
+          <input type="date" id="due-date" />
+        </div>
+        <button id="add-task-btn">Add</button>
+      </section>
+      <section id="task-list">
+        <h2>Tasks</h2>
+        <ul id="tasks"></ul>
+      </section>
+    </main>
+    <footer>© 2025 Task Track</footer>
   </body>
 </html>
