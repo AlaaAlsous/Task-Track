@@ -2,33 +2,40 @@
 
 const taskList = document.getElementById("tasks");
 const sortByIdCheckbox = document.getElementById("sortById");
-const sortByDeadlineCheckbox = document.getElementById("sortByDeadline");
+const sortByPriorityCheckbox = document.getElementById("sortByPriority");
 
 async function loadTasks() {
   const response = await fetch("/api/tasks");
   let tasks = await response.json();
 
-  if (sortByIdCheckbox.checked) {
-    tasks = tasks.sort((a, b) => a.id - b.id);
-    tasks = tasks.sort((a, b) => a.done - b.done);
-  } else if (sortByDeadlineCheckbox.checked) {
-    tasks = tasks.sort((a, b) => new Date(a.deadline) - new Date(b.deadline));
-    tasks = tasks.sort((a, b) => a.done - b.done);
-  } else {
-    tasks = tasks.sort((a, b) => {
-      if (a.done !== b.done) return a.done - b.done;
-      return new Date(a.deadline) - new Date(b.deadline);
-    });
-  }
+  tasks = tasks.sort((a, b) => {
+    if (a.done !== b.done) return a.done - b.done;
+    if (sortByIdCheckbox.checked) {
+      return a.id - b.id;
+    } else if (sortByPriorityCheckbox.checked) {
+      const priorityOrder = { High: 1, Medium: 2, Low: 3 };
+      return priorityOrder[a.priority] - priorityOrder[b.priority];
+    } else {
+      const dateA =
+        a.deadline && a.deadline !== "No deadline"
+          ? new Date(a.deadline).getTime()
+          : Number.MAX_SAFE_INTEGER;
+      const dateB =
+        b.deadline && b.deadline !== "No deadline"
+          ? new Date(b.deadline).getTime()
+          : Number.MAX_SAFE_INTEGER;
+      return dateA - dateB;
+    }
+  });
 
   taskList.innerHTML = "";
   for (const task of tasks) {
     const listItem = document.createElement("li");
     listItem.innerHTML = `<input type="checkbox" class="done-checkbox" ${
       task.done ? "checked" : ""
-    }/> ${task.id}- (${task.taskText}) | (${task.deadline}) | (${
-      task.priority
-    }) | 
+    }/> ${task.id}- (${task.taskText}) | (${
+      task.deadline ?? "No deadline"
+    }) | (${task.priority}) | 
       <button class="deleteBtn">Remove</button>`;
     const doneCheckbox = listItem.querySelector(".done-checkbox");
     doneCheckbox.onchange = async (e) => {
@@ -45,6 +52,7 @@ async function loadTasks() {
     deleteBtn.onclick = async () => {
       await fetch(`/api/tasks/${task.id}`, { method: "DELETE" });
       listItem.remove();
+      loadTasks();
     };
     taskList.appendChild(listItem);
   }
@@ -69,7 +77,7 @@ async function addTask() {
     body: JSON.stringify({
       taskText: taskText,
       priority: taskPriority ? taskPriority : "Low",
-      deadline: taskDeadline ? taskDeadline : "No deadline",
+      deadline: taskDeadline ? taskDeadline : null,
     }),
   });
   taskTextInput.value = "";
@@ -81,13 +89,13 @@ addBtn.onclick = addTask;
 
 sortByIdCheckbox.onchange = () => {
   if (sortByIdCheckbox.checked) {
-    sortByDeadlineCheckbox.checked = false;
+    sortByPriorityCheckbox.checked = false;
   }
   loadTasks();
 };
 
-sortByDeadlineCheckbox.onchange = () => {
-  if (sortByDeadlineCheckbox.checked) {
+sortByPriorityCheckbox.onchange = () => {
+  if (sortByPriorityCheckbox.checked) {
     sortByIdCheckbox.checked = false;
   }
   loadTasks();

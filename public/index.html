@@ -13,7 +13,7 @@
       <section id="task-input">
         <div>
           <label for="new-task">New Task:</label>
-          <input type="text" id="new-task" placeholder="Add new task..." />
+          <input type="text" id="new-task" placeholder="Add new task..." maxlength="200" />
         </div>
         <div>
           <label for="priority">Priority:</label>
@@ -31,8 +31,8 @@
       </section>
       <section id="task-list">
         <h2>Tasks</h2>
-        <input type="checkbox" id="sortById" /> Sort by ID
-        <input type="checkbox" id="sortByDeadline" /> Sort by Deadline
+        <label><input type="checkbox" id="sortById" /> Sort by ID</label>
+        <label><input type="checkbox" id="sortByPriority" /> Sort by Priority</label>
         <ul id="tasks"></ul>
       </section>
     </main>

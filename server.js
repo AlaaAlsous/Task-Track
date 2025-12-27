@@ -27,8 +27,8 @@ app.get("/api/tasks", (req, res) => {
 
 app.post("/api/tasks", async (req, res) => {
   const { taskText, deadline, priority } = req.body;
-  if (!taskText || !deadline || !priority) {
-    return res.status(400).json({ error: "Task, Deadline och Priority krävs" });
+  if (!taskText || !priority) {
+    return res.status(400).json({ error: "Task och Priority krävs" });
   }
   const newTask = {
     id: taskId++,
