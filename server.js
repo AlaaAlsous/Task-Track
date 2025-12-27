@@ -34,6 +34,18 @@ app.post("/api/tasks", (req, res) => {
   res.status(201).json(newTask);
 });
 
+app.patch("/api/tasks/:id", (req, res) => {
+  const taskId = Number(req.params.id);
+  const { done } = req.body;
+  for (let i = 0; i < tasks.length; i++) {
+    if (tasks[i].id === taskId) {
+      tasks[i].done = done;
+      return res.json(tasks[i]);
+    }
+  }
+  res.status(404).json({ error: "Task not found" });
+});
+
 app.listen(port, () => {
   console.log(`http://localhost:${port}`);
 });
