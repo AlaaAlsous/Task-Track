@@ -46,6 +46,17 @@ app.patch("/api/tasks/:id", (req, res) => {
   res.status(404).json({ error: "Task not found" });
 });
 
+app.delete("/api/tasks/:id", (req, res) => {
+  const taskId = Number(req.params.id);
+  for (let i = 0; i < tasks.length; i++) {
+    if (tasks[i].id === taskId) {
+      tasks.splice(i, 1);
+      return res.status(204).end();
+    }
+  }
+  res.status(404).json({ error: "Task not found" });
+});
+
 app.listen(port, () => {
   console.log(`http://localhost:${port}`);
 });
