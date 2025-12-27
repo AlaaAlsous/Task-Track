@@ -1,6 +1,7 @@
 "use strict";
 
 import express from "express";
+import fs from "fs";
 const app = express();
 const port = 80;
 
@@ -9,6 +10,14 @@ app.use(express.json());
 
 let tasks = [];
 let taskId = 1;
+
+if (fs.existsSync("tasks.json")) {
+  const data = fs.readFileSync("tasks.json", "utf8");
+  tasks = JSON.parse(data);
+  if (tasks.length > 0) {
+    taskId = Math.max(...tasks.map(t => t.id)) + 1;
+  }
+}
 
 app.get("/index.html", (req, res) => {
   res.redirect("/");
@@ -31,6 +40,7 @@ app.post("/api/tasks", (req, res) => {
     done: false,
   };
   tasks.push(newTask);
+  saveTasks();
   res.status(201).json(newTask);
 });
 
@@ -40,6 +50,7 @@ app.patch("/api/tasks/:id", (req, res) => {
   for (let i = 0; i < tasks.length; i++) {
     if (tasks[i].id === taskId) {
       tasks[i].done = done;
+      saveTasks();
       return res.json(tasks[i]);
     }
   }
@@ -51,6 +62,7 @@ app.delete("/api/tasks/:id", (req, res) => {
   for (let i = 0; i < tasks.length; i++) {
     if (tasks[i].id === taskId) {
       tasks.splice(i, 1);
+      saveTasks();
       return res.status(204).end();
     }
   }
@@ -60,3 +72,7 @@ app.delete("/api/tasks/:id", (req, res) => {
 app.listen(port, () => {
   console.log(`http://localhost:${port}`);
 });
+
+function saveTasks() {
+  fs.writeFileSync("tasks.json", JSON.stringify(tasks));
+}
