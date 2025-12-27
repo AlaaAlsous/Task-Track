@@ -1,10 +1,26 @@
 "use strict";
 
 const taskList = document.getElementById("tasks");
+const sortByIdCheckbox = document.getElementById("sortById");
+const sortByDeadlineCheckbox = document.getElementById("sortByDeadline");
+
 async function loadTasks() {
   const response = await fetch("/api/tasks");
   let tasks = await response.json();
-  tasks = tasks.sort((a, b) => a.done - b.done);
+
+  if (sortByIdCheckbox.checked) {
+    tasks = tasks.sort((a, b) => a.id - b.id);
+    tasks = tasks.sort((a, b) => a.done - b.done);
+  } else if (sortByDeadlineCheckbox.checked) {
+    tasks = tasks.sort((a, b) => new Date(a.deadline) - new Date(b.deadline));
+    tasks = tasks.sort((a, b) => a.done - b.done);
+  } else {
+    tasks = tasks.sort((a, b) => {
+      if (a.done !== b.done) return a.done - b.done;
+      return new Date(a.deadline) - new Date(b.deadline);
+    });
+  }
+
   taskList.innerHTML = "";
   for (const task of tasks) {
     const listItem = document.createElement("li");
@@ -28,7 +44,7 @@ async function loadTasks() {
     const deleteBtn = listItem.querySelector(".deleteBtn");
     deleteBtn.onclick = async () => {
       await fetch(`/api/tasks/${task.id}`, { method: "DELETE" });
-      location.reload();
+      listItem.remove();
     };
     taskList.appendChild(listItem);
   }
@@ -62,3 +78,17 @@ async function addTask() {
   loadTasks();
 }
 addBtn.onclick = addTask;
+
+sortByIdCheckbox.onchange = () => {
+  if (sortByIdCheckbox.checked) {
+    sortByDeadlineCheckbox.checked = false;
+  }
+  loadTasks();
+};
+
+sortByDeadlineCheckbox.onchange = () => {
+  if (sortByDeadlineCheckbox.checked) {
+    sortByIdCheckbox.checked = false;
+  }
+  loadTasks();
+};
