@@ -99,7 +99,7 @@ app.listen(port, () => {
 async function saveTasks() {
   try {
     await fs.promises.writeFile("tasks.json", JSON.stringify(tasks));
-  } catch {
-    throw new Error("Failed to save tasks");
+  } catch (error) {
+    throw error;
   }
 }
