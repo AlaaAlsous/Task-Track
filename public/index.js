@@ -34,3 +34,31 @@ async function loadTasks() {
   }
 }
 loadTasks();
+
+const taskTextInput = document.getElementById("new-task");
+const priorityInput = document.getElementById("priority");
+const deadlineInput = document.getElementById("due-date");
+const addBtn = document.getElementById("add-task-btn");
+
+async function addTask() {
+  const taskText = taskTextInput.value.trim();
+  const taskPriority = priorityInput.value;
+  const taskDeadline = deadlineInput.value;
+  if (!taskText) return;
+  await fetch("/api/tasks", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      taskText: taskText,
+      priority: taskPriority ? taskPriority : "Low",
+      deadline: taskDeadline ? taskDeadline : "No deadline",
+    }),
+  });
+  taskTextInput.value = "";
+  priorityInput.value = "Low";
+  deadlineInput.value = "";
+  loadTasks();
+}
+addBtn.onclick = addTask;
