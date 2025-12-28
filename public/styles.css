@@ -1,11 +1,23 @@
-html,
-body {
-  font-family: Helvetica, sans-serif;
-  font-size: 16px;
-  margin: 0;
-  padding: 0;
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
   height: 100%;
-  width: 100%;
+  font-size: 16px;
+  scroll-behavior: smooth;
+}
+
+body {
+  min-height: 100%;
+  margin: 0;
+  font-family: Helvetica, Arial, sans-serif;
+  line-height: 1.6;
+  font-size: clamp(0.8rem, 2vw, 1rem);
   background-color: #3c3c3c;
   color: white;
+  display: flex;
+  flex-direction: column;
 }
