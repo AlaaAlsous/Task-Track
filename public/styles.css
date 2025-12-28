@@ -59,3 +59,37 @@ main {
   background-color: #2b2b2b;
   border-radius: 5px;
 }
+
+.new-task-input,
+.priority-input,
+.due-date-input,
+.add-task-btn {
+  font-size: clamp(0.8rem, 2vw, 1.1rem);
+  padding: 0.3rem;
+  background-color: #3c3c3c;
+  border: 1px solid #b0b0b0;
+  border-radius: 5px;
+}
+.new-task-input label,
+.priority-input label,
+.due-date-input label {
+  display: block;
+  margin-bottom: 0.2rem;
+  justify-self: center;
+  font-size: clamp(0.8rem, 2vw, 1.2rem);
+  background: radial-gradient(circle, #383838, #828282);
+  width: 100%;
+  text-align: center;
+  border-radius: 3px;
+}
+.new-task-input input,
+.priority-input select,
+.due-date-input input {
+  width: 100%;
+  padding: 0.3rem;
+  font-size: clamp(0.8rem, 2vw, 1.2rem);
+  border: 1px solid #b0b0b0;
+  border-radius: 3px;
+  outline: none;
+  background-color: #b0b0b0;
+}
