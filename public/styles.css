@@ -93,3 +93,19 @@ main {
   outline: none;
   background-color: #b0b0b0;
 }
+.new-task-input {
+  grid-area: new-task;
+}
+.priority-input {
+  grid-area: priority;
+}
+.due-date-input {
+  grid-area: due-date;
+}
+
+.add-task-btn {
+  grid-area: add-btn;
+  cursor: pointer;
+  color: white;
+  font-size: clamp(0.8rem, 2vw, 1.2rem);
+}
