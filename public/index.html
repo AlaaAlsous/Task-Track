@@ -10,32 +10,46 @@
   <body>
     <header><h1>Task Track</h1></header>
     <main>
-      <section id="task-input">
-        <div>
-          <label for="new-task">New Task:</label>
-          <input type="text" id="new-task" placeholder="Add new task..." maxlength="200" />
+      <section class="task-input" id="task-input">
+        <div class="new-task-input">
+          <label for="new-task">New Task</label>
+          <input
+            type="text"
+            id="new-task"
+            placeholder="Add new task..."
+            maxlength="200"
+            autofocus
+          />
         </div>
-        <div>
-          <label for="priority">Priority:</label>
+        <div class="priority-input">
+          <label for="priority">Priority</label>
           <select id="priority">
             <option value="Low">Low</option>
             <option value="Medium">Medium</option>
             <option value="High">High</option>
           </select>
         </div>
-        <div>
-          <label for="due-date">Due Date:</label>
+        <div class="due-date-input">
+          <label for="due-date">Due Date</label>
           <input type="date" id="due-date" />
         </div>
-        <button id="add-task-btn">Add</button>
+        <button class="add-task-btn" id="add-task-btn">Add</button>
       </section>
-      <section id="task-list">
+      <section class="task-list" id="task-list">
         <h2>Tasks</h2>
-        <label><input type="checkbox" id="sortById" /> Sort by ID</label>
-        <label><input type="checkbox" id="sortByPriority" /> Sort by Priority</label>
-        <ul id="tasks"></ul>
+        <div class="sort-count">
+          <div class="total">Total Tasks: <span id="total-tasks">0</span></div>
+          <label><input type="checkbox" id="sortById" /> Sort by ID</label>
+          <label
+            ><input type="checkbox" id="sortByPriority" /> Sort by
+            Priority</label
+          >
+        </div>
+        <div class="all-tasks">
+          <ul id="tasks"></ul>
+        </div>
       </section>
     </main>
-    <footer>© 2025 Task Track</footer>
+    <footer><p>© 2025 Task Track</p></footer>
   </body>
 </html>
