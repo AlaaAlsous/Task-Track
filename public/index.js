@@ -9,7 +9,7 @@ async function loadTasks() {
     const response = await fetch("/api/tasks");
     if (!response.ok) throw new Error("Failed to load tasks");
     let tasks = await response.json();
-
+    document.getElementById("total-tasks").innerText = tasks.length;
     tasks = tasks.sort((a, b) => {
       if (a.done !== b.done) return a.done - b.done;
       if (sortByIdCheckbox.checked) {
@@ -104,11 +104,16 @@ async function addTask() {
     priorityInput.value = "Low";
     deadlineInput.value = "";
     loadTasks();
+    taskTextInput.focus();
   } catch (error) {
     alert("Could not add task. Please try again.");
   }
 }
 addBtn.onclick = addTask;
+
+taskTextInput.addEventListener("keydown", (e) => {
+  if (e.key === "Enter") addBtn.click();
+});
 
 sortByIdCheckbox.onchange = () => {
   if (sortByIdCheckbox.checked) {
