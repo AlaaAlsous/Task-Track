@@ -77,6 +77,7 @@ async function loadTasks() {
           });
           if (!response.ok) throw new Error("Failed to delete task");
           listItem.remove();
+          showNotification("Task deleted!");
           loadTasks();
         } catch (error) {
           alert("Could not delete task. Please try again.");
@@ -121,6 +122,7 @@ async function addTask() {
     deadlineInput.value = "";
     categoryInput.value = "";
     loadTasks();
+    showNotification("Task added!");
     taskTextInput.focus();
   } catch (error) {
     alert("Could not add task. Please try again.");
@@ -155,3 +157,12 @@ sortByCategoryCheckbox.onchange = () => {
   }
   loadTasks();
 };
+
+function showNotification(message) {
+  const notification = document.getElementById("notification");
+  notification.innerText = message;
+  notification.classList.remove("show-notification");
+  setTimeout(() => {
+    notification.classList.add("show-notification");
+  }, 3000);
+}
