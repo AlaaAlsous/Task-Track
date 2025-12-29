@@ -43,7 +43,7 @@ app.post("/api/tasks", async (req, res) => {
       taskText,
       priority,
       deadline: deadline || null,
-      category: category || null,
+      category,
       done: false,
     };
     tasks.push(newTask);

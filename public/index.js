@@ -3,6 +3,7 @@
 const taskList = document.getElementById("tasks");
 const sortByIdCheckbox = document.getElementById("sortById");
 const sortByPriorityCheckbox = document.getElementById("sortByPriority");
+const sortByCategoryCheckbox = document.getElementById("sortByCategory");
 
 async function loadTasks() {
   try {
@@ -17,13 +18,21 @@ async function loadTasks() {
       } else if (sortByPriorityCheckbox.checked) {
         const priorityOrder = { High: 1, Medium: 2, Low: 3 };
         return priorityOrder[a.priority] - priorityOrder[b.priority];
+      } else if (sortByCategoryCheckbox.checked) {
+        const categoryOrder = {
+          Private: 1,
+          Work: 2,
+          School: 3,
+          "No Category": 4,
+        };
+        return categoryOrder[a.category] - categoryOrder[b.category];
       } else {
         const dateA =
-          a.deadline && a.deadline !== "No deadline"
+          a.deadline && a.deadline !== "No Deadline"
             ? new Date(a.deadline).getTime()
             : Number.MAX_SAFE_INTEGER;
         const dateB =
-          b.deadline && b.deadline !== "No deadline"
+          b.deadline && b.deadline !== "No Deadline"
             ? new Date(b.deadline).getTime()
             : Number.MAX_SAFE_INTEGER;
         return dateA - dateB;
@@ -38,10 +47,10 @@ async function loadTasks() {
       }/> <div class="task-id">${task.id}</div><div class="task-text">${
         task.taskText
       }</div> <div class="task-deadline">${
-        task.deadline ?? "No deadline"
-      }</div> <div class="task-priority">${task.priority}</div> <div class="task-category">${
-        task.category ?? "No category"
-      }</div>
+        task.deadline ?? "No Deadline"
+      }</div>  <div class="task-category">${
+        task.category
+      }</div><div class="task-priority">${task.priority}</div>
       <button class="deleteBtn">X</button>`;
       const doneCheckbox = listItem.querySelector(".done-checkbox");
       doneCheckbox.onchange = async (e) => {
@@ -103,7 +112,7 @@ async function addTask() {
         taskText: taskText,
         priority: taskPriority ? taskPriority : "Low",
         deadline: taskDeadline ? taskDeadline : null,
-        category: taskCategory ? taskCategory : null,
+        category: taskCategory ? taskCategory : "No Category",
       }),
     });
     if (!response.ok) throw new Error("Failed to add task");
@@ -126,6 +135,7 @@ taskTextInput.addEventListener("keydown", (e) => {
 sortByIdCheckbox.onchange = () => {
   if (sortByIdCheckbox.checked) {
     sortByPriorityCheckbox.checked = false;
+    sortByCategoryCheckbox.checked = false;
   }
   loadTasks();
 };
@@ -133,6 +143,15 @@ sortByIdCheckbox.onchange = () => {
 sortByPriorityCheckbox.onchange = () => {
   if (sortByPriorityCheckbox.checked) {
     sortByIdCheckbox.checked = false;
+    sortByCategoryCheckbox.checked = false;
+  }
+  loadTasks();
+};
+
+sortByCategoryCheckbox.onchange = () => {
+  if (sortByCategoryCheckbox.checked) {
+    sortByIdCheckbox.checked = false;
+    sortByPriorityCheckbox.checked = false;
   }
   loadTasks();
 };

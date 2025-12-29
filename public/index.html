@@ -24,7 +24,7 @@
         <div class="priority-input">
           <label for="priority">Priority</label>
           <select id="priority">
-            <option value="">Select priority...</option>
+            <option value="">Select Priority...</option>
             <option value="Low">Low</option>
             <option value="Medium">Medium</option>
             <option value="High">High</option>
@@ -37,10 +37,11 @@
         <div class="category-input">
           <label for="category">Category</label>
           <select id="category">
-            <option value="">Select category...</option>
-            <option value="School">School</option>
-            <option value="Work">Work</option>
+            <option value="">Select Category...</option>
             <option value="Private">Private</option>
+            <option value="Work">Work</option>
+            <option value="School">School</option>
+            <option value="No Category">No Category</option>
           </select>
         </div>
         <button class="add-task-btn" id="add-task-btn">Add</button>
@@ -49,10 +50,14 @@
         <h2>Tasks</h2>
         <div class="sort-count">
           <div class="total">Total Tasks: <span id="total-tasks">0</span></div>
-          <label><input type="checkbox" id="sortById" /> Sort by ID</label>
+          <label><input type="checkbox" id="sortById" />Sort by ID</label>
           <label
-            ><input type="checkbox" id="sortByPriority" /> Sort by
+            ><input type="checkbox" id="sortByPriority" />Sort by
             Priority</label
+          >
+          <label
+            ><input type="checkbox" id="sortByCategory" />Sort by
+            Category</label
           >
         </div>
         <div class="all-tasks">
