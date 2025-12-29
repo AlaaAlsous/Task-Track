@@ -139,11 +139,12 @@ main {
 .sort-count label {
   display: flex;
   align-items: center;
-  gap: 0.3rem;
+  gap: 0.4rem;
 }
 #sortById,
 #sortByPriority {
   transform: scale(1.3);
+  cursor: pointer;
 }
 .total {
   margin-right: auto;
@@ -151,4 +152,33 @@ main {
 
 .task-list ul {
   list-style: none;
+}
+
+.task-list li {
+  background-color: #3c3c3c;
+  margin-bottom: 0.5rem;
+  padding: 0.5rem;
+  border-radius: 5px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.done-checkbox {
+  transform: scale(1.3);
+  cursor: pointer;
+}
+
+.task-id {
+  font-size: clamp(0.8rem, 2vw, 1rem);
+  margin: 0.5rem auto 0.5rem 0;
+  border: 1px solid #b0b0b0;
+  border-radius: 5px;
+  background: radial-gradient(circle, #383838, #828282);
+  width: 3rem;
+  height: 2rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
