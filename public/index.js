@@ -35,10 +35,12 @@ async function loadTasks() {
       const listItem = document.createElement("li");
       listItem.innerHTML = `<input type="checkbox" class="done-checkbox" ${
         task.done ? "checked" : ""
-      }/> <div class="task-id">${task.id}</div><div class="task-text">(${task.taskText})</div> <div class="task-deadline">(${
+      }/> <div class="task-id">${task.id}</div><div class="task-text">${
+        task.taskText
+      }</div> <div class="task-deadline">${
         task.deadline ?? "No deadline"
-      })</div> <div class="task-priority">(${task.priority})</div> 
-      <button class="deleteBtn">Remove</button>`;
+      }</div> <div class="task-priority">${task.priority}</div> 
+      <button class="deleteBtn">X</button>`;
       const doneCheckbox = listItem.querySelector(".done-checkbox");
       doneCheckbox.onchange = async (e) => {
         try {
