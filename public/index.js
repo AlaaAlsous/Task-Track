@@ -42,16 +42,35 @@ async function loadTasks() {
     taskList.innerHTML = "";
     for (const task of tasks) {
       const listItem = document.createElement("li");
+
+      let oneDayLeft = false;
+      if (task.deadline && task.deadline !== "No Deadline" && !task.done) {
+        const deadlineDate = new Date(task.deadline);
+        const now = new Date();
+        const diffTime = deadlineDate.getTime() - now.getTime();
+        const diffDays = diffTime / (1000 * 60 * 60 * 24);
+        if (diffDays <= 1 && diffDays > 0) {
+          oneDayLeft = true;
+        }
+      }
+
+      let formattedDeadline = task.deadline
+        ? task.deadline.replace("T", " ")
+        : "No Deadline";
+
       listItem.innerHTML = `<input type="checkbox" class="done-checkbox" ${
         task.done ? "checked" : ""
       }/> <div class="task-id">${task.id}</div><div class="task-text">${
         task.taskText
-      }</div> <div class="task-deadline">${
-        task.deadline ?? "No Deadline"
-      }</div>  <div class="task-category">${
+      }</div> <div class="task-deadline">${formattedDeadline}</div>  <div class="task-category">${
         task.category
       }</div><div class="task-priority">${task.priority}</div>
       <button class="deleteBtn">X</button>`;
+
+      if (oneDayLeft) {
+        listItem.classList.add("one-day-left");
+      }
+
       const doneCheckbox = listItem.querySelector(".done-checkbox");
       doneCheckbox.onchange = async (e) => {
         try {
