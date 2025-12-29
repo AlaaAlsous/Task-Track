@@ -181,15 +181,29 @@ main {
 
 .task-list li.one-day-left {
   border: 2px solid #b0b0b0;
-  animation: glow-pulse 1.5s ease-in-out infinite;
+  animation: white-glow-pulse 1.5s ease-in-out infinite;
 }
-@keyframes glow-pulse {
+@keyframes white-glow-pulse {
   0%,
   100% {
     box-shadow: 0 0 2px #b0b0b0, 0 0 2px #b0b0b0;
   }
   50% {
-    box-shadow: 0 0 8px #b0b0b0, 0 0 8px #b0b0b0;
+    box-shadow: 0 0 10px #b0b0b0, 0 0 10px #b0b0b0;
+  }
+}
+
+.task-list li.one-hour-left {
+  border: 2px solid #ca0000;
+  animation: red-glow-pulse 1.5s ease-in-out infinite;
+}
+@keyframes red-glow-pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 2px #ca0000, 0 0 2px #ca0000;
+  }
+  50% {
+    box-shadow: 0 0 10px #ca0000, 0 0 10px #ca0000;
   }
 }
 

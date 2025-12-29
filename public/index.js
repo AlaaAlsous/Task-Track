@@ -54,6 +54,17 @@ async function loadTasks() {
         }
       }
 
+      let oneHourLeft = false;
+      if (task.deadline && task.deadline !== "No Deadline" && !task.done) {
+        const deadlineDate = new Date(task.deadline);
+        const now = new Date();
+        const diffTime = deadlineDate.getTime() - now.getTime();
+        const diffHours = diffTime / (1000 * 60 * 60);
+        if (diffHours <= 1 && diffHours > 0) {
+          oneHourLeft = true;
+        }
+      }
+
       let formattedDeadline = task.deadline
         ? task.deadline.replace("T", " ")
         : "No Deadline";
@@ -70,7 +81,10 @@ async function loadTasks() {
       if (oneDayLeft) {
         listItem.classList.add("one-day-left");
       }
-
+      if (oneHourLeft) {
+        listItem.classList.add("one-hour-left");
+      }
+      
       const doneCheckbox = listItem.querySelector(".done-checkbox");
       doneCheckbox.onchange = async (e) => {
         try {
