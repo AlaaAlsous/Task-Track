@@ -177,7 +177,8 @@ main {
 }
 .task-deadline,
 .task-id,
-.task-priority {
+.task-priority,
+.task-category {
   font-size: clamp(0.7rem, 2vw, 1rem);
   margin: 0.3rem 0 0.3rem 0;
   border: 1px solid #b0b0b0;

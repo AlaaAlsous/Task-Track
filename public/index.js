@@ -39,7 +39,9 @@ async function loadTasks() {
         task.taskText
       }</div> <div class="task-deadline">${
         task.deadline ?? "No deadline"
-      }</div> <div class="task-priority">${task.priority}</div> 
+      }</div> <div class="task-priority">${task.priority}</div> <div class="task-category">${
+        task.category ?? "No category"
+      }</div>
       <button class="deleteBtn">X</button>`;
       const doneCheckbox = listItem.querySelector(".done-checkbox");
       doneCheckbox.onchange = async (e) => {
@@ -82,6 +84,7 @@ loadTasks();
 const taskTextInput = document.getElementById("new-task");
 const priorityInput = document.getElementById("priority");
 const deadlineInput = document.getElementById("due-date");
+const categoryInput = document.getElementById("category");
 const addBtn = document.getElementById("add-task-btn");
 
 async function addTask() {
@@ -89,6 +92,7 @@ async function addTask() {
     const taskText = taskTextInput.value.trim();
     const taskPriority = priorityInput.value;
     const taskDeadline = deadlineInput.value;
+    const taskCategory = categoryInput.value;
     if (!taskText) return;
     const response = await fetch("/api/tasks", {
       method: "POST",
@@ -99,12 +103,14 @@ async function addTask() {
         taskText: taskText,
         priority: taskPriority ? taskPriority : "Low",
         deadline: taskDeadline ? taskDeadline : null,
+        category: taskCategory ? taskCategory : null,
       }),
     });
     if (!response.ok) throw new Error("Failed to add task");
     taskTextInput.value = "";
-    priorityInput.value = "Low";
+    priorityInput.value = "";
     deadlineInput.value = "";
+    categoryInput.value = "";
     loadTasks();
     taskTextInput.focus();
   } catch (error) {

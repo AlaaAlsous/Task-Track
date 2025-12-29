@@ -32,7 +32,7 @@ app.get("/api/tasks", (req, res) => {
 
 app.post("/api/tasks", async (req, res) => {
   try {
-    const { taskText, deadline, priority } = req.body;
+    const { taskText, deadline, priority, category } = req.body;
     if (!taskText || !priority) {
       return res
         .status(400)
@@ -43,6 +43,7 @@ app.post("/api/tasks", async (req, res) => {
       taskText,
       priority,
       deadline: deadline || null,
+      category: category || null,
       done: false,
     };
     tasks.push(newTask);
