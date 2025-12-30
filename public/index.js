@@ -65,6 +65,15 @@ async function loadTasks() {
         }
       }
 
+      let timeIsUp = false;
+      if (task.deadline && task.deadline !== "No Deadline") {
+        const deadlineDate = new Date(task.deadline);
+        const now = new Date();
+        if (now.getTime() > deadlineDate.getTime()) {
+          timeIsUp = true;
+        }
+      }
+
       let formattedDeadline = task.deadline
         ? task.deadline.replace("T", " ")
         : "No Deadline";
@@ -72,7 +81,8 @@ async function loadTasks() {
       listItem.innerHTML = `<input type="checkbox" class="done-checkbox" ${
         task.done ? "checked" : ""
       }/> <div class="task-id">${task.id}</div><div class="task-text">${
-        task.taskText
+        task.taskText +
+        (timeIsUp ? "<span style = color:orange> (Time is up!)</span>" : "")
       }</div> <div class="task-deadline">${formattedDeadline}</div>  <div class="task-category">${
         task.category
       }</div><div class="task-priority">${task.priority}</div>
@@ -84,7 +94,10 @@ async function loadTasks() {
       if (oneHourLeft) {
         listItem.classList.add("one-hour-left");
       }
-      
+      if (timeIsUp) {
+        listItem.classList.add("time-is-up");
+      }
+
       const doneCheckbox = listItem.querySelector(".done-checkbox");
       doneCheckbox.onchange = async (e) => {
         try {
