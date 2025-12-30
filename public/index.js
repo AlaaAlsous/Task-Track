@@ -75,14 +75,14 @@ async function loadTasks() {
       }
 
       let formattedDeadline = task.deadline
-        ? task.deadline.replace("T", " ")
+        ? task.deadline.replace("T", " | ")
         : "No Deadline";
 
       listItem.innerHTML = `<input type="checkbox" class="done-checkbox" ${
         task.done ? "checked" : ""
       }/> <div class="task-id">${task.id}</div><div class="task-text">${
         task.taskText +
-        (timeIsUp ? "<span style = color:orange> (Time is up!)</span>" : "")
+        (timeIsUp ? "<span style = color:red> (Expired!)</span>" : "")
       }</div> <div class="task-deadline">${formattedDeadline}</div>  <div class="task-category">${
         task.category
       }</div><div class="task-priority">${task.priority}</div>
