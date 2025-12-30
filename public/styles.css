@@ -29,6 +29,7 @@ footer {
   color: white;
   user-select: none;
 }
+
 header h1 {
   text-align: center;
   padding: 0.5rem;
@@ -268,4 +269,51 @@ main {
 
 .show-notification {
   display: none;
+}
+
+.about-content {
+  background-color: #2b2b2b;
+  padding: 2rem;
+  border-radius: 5px;
+  margin: 1rem auto;
+}
+
+.about-content h2 {
+  text-align: center;
+  color: white;
+  margin-top: 0;
+}
+
+.about-content h3 {
+  color: #b0b0b0;
+  margin-top: 1.5rem;
+}
+
+.about-content ul,
+.about-content ol {
+  line-height: 1.8;
+}
+
+.about-content li {
+  margin-bottom: 0.5rem;
+}
+
+.back-link {
+  text-align: center;
+  margin-top: 2rem;
+}
+
+.btn-back {
+  display: inline-block;
+  padding: 0.8rem 1.5rem;
+  background-color: #3c3c3c;
+  color: white;
+  text-decoration: none;
+  border-radius: 5px;
+  border: 1px solid #b0b0b0;
+  transition: background-color 0.3s;
+}
+
+.btn-back:hover {
+  background-color: #4c4c4c;
 }
