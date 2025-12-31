@@ -571,3 +571,55 @@ main {
     gap: 3rem;
   }
 }
+
+@media (max-width: 480px) {
+  .task-list ul {
+    padding: 0 0.5rem;
+  }
+  .task-list li {
+    flex-wrap: wrap;
+  }
+  .done-checkbox {
+    order: 1;
+  }
+  .task-text {
+    order: 3;
+    flex: 1;
+    min-width: 15rem;
+  }
+  .deleteBtn {
+    order: 7;
+  }
+  .task-id {
+    order: 2;
+  }
+  .task-priority {
+    order: 4;
+  }
+  .task-category {
+    order: 5;
+  }
+  .task-deadline {
+    order: 6;
+  }
+  .sort-count {
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
+    padding: 0.5rem;
+  }
+  .sort-count label {
+    justify-content: left;
+  }
+  .nav {
+    gap: 1rem;
+  }
+  .task-input {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "new-task"
+      "priority"
+      "due-date"
+      "category"
+      "add-btn";
+  }
+}
