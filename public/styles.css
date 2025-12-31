@@ -3,13 +3,11 @@
 *::after {
   box-sizing: border-box;
 }
-
 html {
   height: 100%;
   font-size: 16px;
   scroll-behavior: smooth;
 }
-
 body {
   min-height: 100%;
   margin: 0;
@@ -28,16 +26,12 @@ header {
     "logo h1"
     "logo h4";
   padding: 0.5rem 0.5rem 0 0.5rem;
-  background-color: #3c3c3c;
 }
 header,
 footer {
   color: white;
   user-select: none;
-}
-footer {
   background-color: #2b2b2b;
-  text-align: center;
 }
 .logo-img {
   grid-area: logo;
@@ -78,7 +72,9 @@ header h4 {
     opacity: 1;
   }
 }
-
+footer {
+  text-align: center;
+}
 .nav {
   display: flex;
   justify-content: center;
@@ -114,14 +110,12 @@ footer p {
   padding: 0.3rem;
   font-size: clamp(0.8rem, 1.5vw, 1rem);
 }
-
 main {
   flex: 1;
   display: flex;
   flex-direction: column;
   padding: 1rem;
 }
-
 .task-input {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -137,7 +131,6 @@ main {
   scroll-margin-top: 4rem;
   box-shadow: 0 0 5px #b0b0b0b4;
 }
-
 .new-task-input,
 .priority-input,
 .due-date-input,
@@ -199,12 +192,10 @@ main {
   background-color: #676767;
   box-shadow: 0 0 2px #000000;
 }
-
 .add-task-btn:hover {
   box-shadow: 0 0 5px #ffffff;
   border: 1.5px solid #e6e6e6;
 }
-
 .task-list {
   flex: 1;
   background-color: #2b2b2b;
@@ -223,7 +214,6 @@ main {
   background: radial-gradient(circle, #383838, #828282);
   user-select: none;
 }
-
 .sort-count {
   display: grid;
   grid-template-columns: 1fr auto auto auto;
@@ -250,12 +240,10 @@ main {
 .total {
   margin-right: auto;
 }
-
 .task-list ul {
   list-style: none;
   padding: 0 2rem 0 2rem;
 }
-
 .task-list li {
   background-color: #3c3c3c;
   margin-bottom: 0.5rem;
@@ -267,7 +255,6 @@ main {
   gap: 0.5rem;
   box-shadow: 0 0 2px #b0b0b0b4;
 }
-
 .task-list li.one-day-left {
   border: 2px solid #b0b0b0;
   animation: white-glow-pulse 1.5s ease-in-out infinite;
@@ -281,7 +268,6 @@ main {
     box-shadow: 0 0 7px #b0b0b0, 0 0 7px #b0b0b0;
   }
 }
-
 .task-list li.one-hour-left {
   border: 2px solid red;
   animation: red-glow-pulse 1.5s ease-in-out infinite;
@@ -295,7 +281,6 @@ main {
     box-shadow: 0 0 7px red, 0 0 7px red;
   }
 }
-
 .done-checkbox {
   transform: scale(1.3);
   cursor: pointer;
@@ -349,63 +334,60 @@ main {
   border: 1.5px solid #e6e6e6;
   color: white;
 }
-
 #notification {
   position: fixed;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  background: #383838;
+  background: #3c3c3c;
   color: white;
   padding: 0.8rem 1rem;
   border-radius: 5px;
   z-index: 1000;
   user-select: none;
+  border: 1px solid #ffffff;
+  box-shadow: 0 0 5px #ffffff;
   font-size: clamp(1rem, 3vw, 1.5rem);
 }
-
 .show-notification {
   display: none;
 }
-
 .about-content {
   background-color: #2b2b2b;
   padding: 2rem;
   border-radius: 5px;
   margin: 1rem auto;
+  font-size: clamp(0.9rem, 2vw, 1.1rem);
+  box-shadow: 0 0 5px #b0b0b0b4;
 }
-
 .about-h1 {
   text-align: left;
   color: white;
   padding-top: 3rem;
+  font-size: clamp(1.5rem, 4vw, 2.5rem);
 }
-
 .about-content h2 {
   text-align: center;
   color: white;
   margin-top: 0;
+  font-size: clamp(1.2rem, 3vw, 2rem);
 }
-
 .about-content h3 {
   color: #b0b0b0;
   margin-top: 1.5rem;
+  font-size: clamp(1rem, 2.5vw, 1.5rem);
 }
-
 .about-content ul,
 .about-content ol {
   line-height: 1.8;
 }
-
 .about-content li {
   margin-bottom: 0.5rem;
 }
-
 .back-link {
   text-align: center;
   margin-top: 2rem;
 }
-
 .btn-back {
   display: inline-block;
   padding: 0.8rem 1.5rem;
@@ -415,12 +397,11 @@ main {
   border-radius: 5px;
   border: 1px solid #b0b0b0;
   transition: background-color 0.3s;
+  font-size: clamp(0.8rem, 2vw, 1rem);
 }
-
 .btn-back:hover {
   background-color: #4c4c4c;
 }
-
 .remove-task {
   animation: fade-out 0.5s ease-in-out forwards;
 }
@@ -430,7 +411,6 @@ main {
     transform: scale(0.7);
   }
 }
-
 .done-task {
   animation: fade-in-done 0.5s ease-in-out forwards;
 }
@@ -444,7 +424,6 @@ main {
     transform: translateY(100px) scale(1.05);
   }
 }
-
 .undone-task {
   animation: fade-in-undone 0.5s ease-in-out forwards;
 }
@@ -456,5 +435,96 @@ main {
   to {
     opacity: 0;
     transform: translateY(-100px) scale(1.05);
+  }
+}
+
+@media (prefers-color-scheme: light) {
+  body {
+    background-color: #f0f0f0;
+    color: #2b2b2b;
+  }
+  header,
+  footer {
+    background-color: #d3d3d3;
+    color: #2b2b2b;
+  }
+  .nav {
+    background-color: #e0e0e0;
+    border: 1px solid #a0a0a0;
+    box-shadow: 0 0 2px #888888;
+  }
+  .nav a {
+    color: #232323;
+    border: 1.5px solid #707070;
+    background-color: #b0b0b0;
+    box-shadow: 0 0 2px #888888;
+  }
+  .nav a:hover {
+    box-shadow: 0 0 5px #000000;
+    border: 1.5px solid #404040;
+  }
+  .task-input,
+  .task-list {
+    background-color: #d3d3d3;
+    box-shadow: 0 0 5px #707070b4;
+  }
+  .new-task-input,
+  .priority-input,
+  .due-date-input,
+  .category-input,
+  .add-task-btn {
+    background-color: #e0e0e0;
+    border: 1px solid #707070;
+    color: #2b2b2b;
+  }
+  .new-task-input label,
+  .priority-input label,
+  .due-date-input label,
+  .category-input label {
+    background: radial-gradient(circle, #c0c0c0, #808080);
+    color: #2b2b2b;
+  }
+  .add-task-btn {
+    color: #2b2b2b;
+    border: 1.5px solid #707070;
+    background-color: #b0b0b0;
+    box-shadow: 0 0 2px #888888;
+  }
+  .add-task-btn:hover {
+    box-shadow: 0 0 5px #000000;
+    border: 1.5px solid #404040;
+  }
+  .task-list h2 {
+    color: #2b2b2b;
+    background: radial-gradient(circle, #c0c0c0, #808080);
+  }
+  .task-list li {
+    background-color: #e0e0e0;
+    box-shadow: 0 0 2px #707070b4;
+  }
+  .task-deadline,
+  .task-id,
+  .task-priority,
+  .task-category {
+    background-color: #c0c0c0;
+    border: 0.1px solid #808080;
+    box-shadow: 0 0 2px #888888;
+  }
+  .deleteBtn {
+    color: #404040;
+    border: 1.5px solid #707070;
+    background-color: #b0b0b0;
+    box-shadow: 0 0 2px #888888;
+  }
+  .deleteBtn:hover {
+    box-shadow: 0 0 4px #000000;
+    border: 1.5px solid #404040;
+    color: #000000;
+  }
+  #notification {
+    background: #e0e0e0;
+    color: #2b2b2b;
+    border: 1px solid #2b2b2b;
+    box-shadow: 0 0 5px #2b2b2b;
   }
 }
