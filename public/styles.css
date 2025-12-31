@@ -27,16 +27,16 @@ header {
   grid-template-areas:
     "logo h1"
     "logo h4";
-  background: linear-gradient(#ddd0c2, #4c4c4c);
   padding: 0.5rem 0.5rem 0 0.5rem;
+  background-color: #3c3c3c;
 }
 header,
 footer {
-  background-color: #2b2b2b;
   color: white;
   user-select: none;
 }
 footer {
+  background-color: #2b2b2b;
   text-align: center;
 }
 .logo-img {
@@ -333,7 +333,7 @@ main {
 .deleteBtn {
   padding: 0.3rem 0.6rem;
   font-size: clamp(0.7rem, 2vw, 1rem);
-  color:#232323;
+  color: #232323;
   font-weight: bold;
   height: 2rem;
   border-radius: 5px;
@@ -419,4 +419,42 @@ main {
 
 .btn-back:hover {
   background-color: #4c4c4c;
+}
+
+.remove-task {
+  animation: fade-out 0.5s ease-in-out forwards;
+}
+@keyframes fade-out {
+  to {
+    opacity: 0;
+    transform: scale(0.7);
+  }
+}
+
+.done-task {
+  animation: fade-in-done 0.5s ease-in-out forwards;
+}
+@keyframes fade-in-done {
+  from {
+    opacity: 1;
+    transform: translateY(0) scale(1.05);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(100px) scale(1.05);
+  }
+}
+
+.undone-task {
+  animation: fade-in-undone 0.5s ease-in-out forwards;
+}
+@keyframes fade-in-undone {
+  from {
+    opacity: 1;
+    transform: translateY(0) scale(1.05);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-100px) scale(1.05);
+  }
 }

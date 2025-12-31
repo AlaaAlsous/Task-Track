@@ -108,10 +108,22 @@ async function loadTasks() {
             body: JSON.stringify({ done: isDone }),
           });
           if (!response.ok) throw new Error("Failed to update task");
-          loadTasks();
+          if (isDone) {
+            listItem.classList.add("done-task");
+            setTimeout(() => {
+              showNotification("Task Completed!");
+              loadTasks();
+            }, 500);
+          } else if (!isDone) {
+            listItem.classList.add("undone-task");
+            setTimeout(() => {
+              showNotification("Task Uncompleted!");
+              loadTasks();
+            }, 500);
+          }
         } catch (error) {
           alert("Could not update task. Please try again.");
-          e.target.checked = !e.target.checked;
+          isDone = !isDone;
         }
       };
 
@@ -122,9 +134,12 @@ async function loadTasks() {
             method: "DELETE",
           });
           if (!response.ok) throw new Error("Failed to delete task");
-          listItem.remove();
-          showNotification("Task deleted!");
-          loadTasks();
+          listItem.classList.add("remove-task");
+          setTimeout(() => {
+            listItem.remove();
+            showNotification("Task Deleted!");
+            loadTasks();
+          }, 500);
         } catch (error) {
           alert("Could not delete task. Please try again.");
         }
@@ -168,7 +183,7 @@ async function addTask() {
     deadlineInput.value = "";
     categoryInput.value = "";
     loadTasks();
-    showNotification("Task added!");
+    showNotification("Task Added!");
     taskTextInput.focus();
   } catch (error) {
     alert("Could not add task. Please try again.");
