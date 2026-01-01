@@ -93,10 +93,6 @@ app.delete("/api/tasks/:id", async (req, res) => {
   }
 });
 
-app.listen(port, () => {
-  console.log(`http://localhost:${port}`);
-});
-
 async function saveTasks() {
   try {
     await fs.promises.writeFile("tasks.json", JSON.stringify(tasks));
@@ -107,4 +103,8 @@ async function saveTasks() {
 
 app.use((req, res) => {
   res.status(404).sendFile("404.html", { root: "public" });
+});
+
+app.listen(port, () => {
+  console.log(`http://localhost:${port}`);
 });
