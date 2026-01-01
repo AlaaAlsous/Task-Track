@@ -104,3 +104,7 @@ async function saveTasks() {
     throw error;
   }
 }
+
+app.use((req, res) => {
+  res.status(404).sendFile("404.html", { root: "public" });
+});
