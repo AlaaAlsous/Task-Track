@@ -85,7 +85,7 @@ async function loadTasks() {
         task.done ? "checked" : ""
       }/> <div class="task-id">${task.id}</div><div class="task-text">${
         task.taskText +
-        (timeIsUp ? "<span style = color:red> (Expired!)</span>" : "")
+        (timeIsUp ? "<span style = color:#750000> (Expired!)</span>" : "")
       }</div> <div class="task-deadline">${formattedDeadline}</div>  <div class="task-category">${
         task.category
       }</div><div class="task-priority">${task.priority}</div>

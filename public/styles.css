@@ -7,6 +7,7 @@ html {
   height: 100%;
   font-size: 16px;
   scroll-behavior: smooth;
+  color: #b1a18e;
 }
 body {
   min-height: 100%;
@@ -14,8 +15,8 @@ body {
   font-family: "Gill Sans", "Gill Sans MT", Calibri, "Trebuchet MS", sans-serif;
   line-height: 1.6;
   font-size: clamp(0.9rem, 2vw, 1rem);
-  background-color: #3c3c3c;
-  color: white;
+  background-color: #2d2820;
+  color: #f5f3ef;
   display: flex;
   flex-direction: column;
 }
@@ -26,7 +27,7 @@ header {
     "logo h1"
     "logo h4";
   padding: 0.5rem;
-  background: linear-gradient(135deg, #2b2b2b 0%, #5e5e5e 50%, #d3d3d3 100%);
+  background: linear-gradient(135deg, #4a3f33 0%, #8c7d68 50%, #c9bfaf 100%);
   background-size: 200% 200%;
   position: relative;
   overflow: hidden;
@@ -51,11 +52,11 @@ header::before {
 }
 header,
 footer {
-  color: white;
+  color: #f5f3ef;
   user-select: none;
 }
 footer {
-  background-color: #2b2b2b;
+  background-color: #4a3f33;
 }
 .logo-img {
   grid-area: logo;
@@ -78,17 +79,17 @@ header h1 {
   margin: 0;
   padding: 0 2rem;
   align-self: flex-end;
-  text-shadow: 2px 2px 4px #000000c3, 0 0 20px #ffffff55;
+  text-shadow: 2px 2px 4px #2d2820c3, 0 0 20px #b1a18e55;
   font-weight: 700;
   letter-spacing: 2px;
 }
 header h4 {
   grid-area: h4;
   font-size: clamp(1rem, 3vw, 1.5rem);
-  text-shadow: 1px 1px 3px #00000099;
+  text-shadow: 1px 1px 3px #2d282099;
   font-weight: 400;
   letter-spacing: 1px;
-  color: #fff6e6;
+  color: #e5dfd5;
   margin: 0;
   padding: 0 2rem;
   align-self: flex-start;
@@ -116,27 +117,27 @@ footer {
   margin-bottom: 0.5rem;
   position: sticky;
   top: 0;
-  background-color: #4c4c4c;
+  background-color: #6b5d4d;
   z-index: 100;
   user-select: none;
-  border: 1px solid #6f6f6f8d;
-  box-shadow: 0 0 2px #000000;
+  border: 1px solid #8c7d688d;
+  box-shadow: 0 0 2px #2d2820;
 }
 .nav a {
-  color: #000000;
+  color: #2d2820;
   text-decoration: none;
   font-size: clamp(0.8rem, 2vw, 1rem);
   padding: 0.1rem 0.6rem;
   border-radius: 5px;
   transition: box-shadow 0.3s, transform 0.3s;
-  border: 2px solid #cdcdcd;
-  background-color: #a3a3a3;
-  box-shadow: 0 0 3px #000000, 0 0 5px #000000b4;
+  border: 2px solid #c9bfaf;
+  background-color: #b1a18e;
+  box-shadow: 0 0 3px #2d2820, 0 0 5px #2d2820b4;
 }
 .nav a:hover {
-  box-shadow: 0 0 5px #ffffff;
-  border: 2px solid #e6e6e6;
-  color: white;
+  box-shadow: 0 0 5px #e5dfd5;
+  border: 2px solid #e5dfd5;
+  color: #f5f3ef;
   transform: scale(1.05);
 }
 footer p {
@@ -160,10 +161,10 @@ main {
   gap: 0.5rem;
   margin-bottom: 1rem;
   padding: 1rem;
-  background-color: #2b2b2b;
+  background-color: #4a3f33;
   border-radius: 5px;
   scroll-margin-top: 4rem;
-  box-shadow: 0 0 5px #b0b0b0b4;
+  box-shadow: 0 0 5px #b1a18eb4;
 }
 .new-task-input,
 .priority-input,
@@ -172,8 +173,8 @@ main {
 .add-task-btn {
   font-size: clamp(0.8rem, 2vw, 1rem);
   padding: 0.3rem;
-  background-color: #3c3c3c;
-  border: 1px solid #b0b0b0;
+  background-color: #6b5d4d;
+  border: 1px solid #b1a18e;
   border-radius: 5px;
 }
 .new-task-input label,
@@ -184,7 +185,7 @@ main {
   margin-bottom: 0.2rem;
   justify-self: center;
   font-size: clamp(0.8rem, 2vw, 1.2rem);
-  background: radial-gradient(circle, #383838, #828282);
+  background: radial-gradient(circle, #4a3f33, #8c7d68);
   width: 100%;
   text-align: center;
   border-radius: 3px;
@@ -197,10 +198,10 @@ main {
   width: 100%;
   padding: 0.3rem;
   font-size: clamp(0.8rem, 2vw, 1.2rem);
-  border: 1px solid #b0b0b0;
+  border: 1px solid #b1a18e;
   border-radius: 3px;
   outline: none;
-  background-color: #b0b0b0;
+  background-color: #c9bfaf;
 }
 .new-task-input {
   grid-area: new-task;
@@ -218,35 +219,35 @@ main {
   grid-area: add-btn;
   padding: 0.5rem 1rem;
   cursor: pointer;
-  color: #000000;
+  color: #2d2820;
   font-size: clamp(0.8rem, 2vw, 1.2rem);
   user-select: none;
-  border: 2px solid #cdcdcd;
-  background-color: #a3a3a3;
-  box-shadow: 0 0 3px #000000, 0 0 5px #000000b4;
+  border: 2px solid #c9bfaf;
+  background-color: #b1a18e;
+  box-shadow: 0 0 3px #2d2820, 0 0 5px #2d2820b4;
   transition: box-shadow 0.3s;
 }
 .add-task-btn:hover {
-  box-shadow: 0 0 5px #ffffff;
-  border: 2px solid #e6e6e6;
-  color: white;
+  box-shadow: 0 0 5px #e5dfd5;
+  border: 2px solid #e5dfd5;
+  color: #f5f3ef;
 }
 .task-list {
   flex: 1;
-  background-color: #2b2b2b;
+  background-color: #4a3f33;
   padding: 1rem;
   border-radius: 5px;
   overflow-y: auto;
   scroll-margin-top: 4rem;
-  box-shadow: 0 0 5px #b0b0b0b4;
+  box-shadow: 0 0 5px #b1a18eb4;
 }
 .task-list h2 {
   margin-top: 0;
   text-align: center;
-  border: 1px solid #b0b0b0;
+  border: 1px solid #b1a18e;
   border-radius: 5px;
-  color: white;
-  background: radial-gradient(circle, #383838, #828282);
+  color: #f5f3ef;
+  background: radial-gradient(circle, #4a3f33, #8c7d68);
   user-select: none;
 }
 .sort-count {
@@ -258,8 +259,8 @@ main {
   justify-content: center;
   margin: 0.5rem 0;
   padding: 0.5rem 1rem;
-  box-shadow: 0 0 5px #ffffffd6;
-  border: 2px solid #ffffff;
+  box-shadow: 0 0 5px #e5dfd5d6;
+  border: 2px solid #e5dfd5;
   border-radius: 5px;
   user-select: none;
 }
@@ -269,16 +270,16 @@ main {
   gap: 0.4rem;
   justify-content: right;
   padding: 0.3rem 0.5rem;
-  border: 1px solid #b0b0b0;
+  border: 1px solid #b1a18e;
   border-radius: 5px;
-  box-shadow: 0 0 3px #ffffff99;
+  box-shadow: 0 0 3px #e5dfd599;
   transition: box-shadow 0.3s, border 0.3s;
   cursor: pointer;
 }
 .sort-count label:hover {
-  box-shadow: 0 0 5px #ffffffd6;
-  border: 1px solid #ffffff;
-  background-color: #a3a3a3;
+  box-shadow: 0 0 5px #e5dfd5d6;
+  border: 1px solid #e5dfd5;
+  background-color: #b1a18e;
 }
 #sortById,
 #sortByPriority,
@@ -303,19 +304,19 @@ main {
   justify-content: center;
   gap: 0.5rem;
   font-weight: 500;
-  background-color: #4c4c4c;
+  background-color: #6b5d4d;
   border-radius: 5px;
-  border: 2px solid #383838;
+  border: 2px solid #4a3f33;
   width: 10rem;
   height: 2rem;
-  box-shadow: 0 0 5px #ffffff;
+  box-shadow: 0 0 5px #e5dfd5;
 }
 .task-list ul {
   list-style: none;
   padding: 0 2rem 0 2rem;
 }
 .task-list li {
-  background-color: #3c3c3c;
+  background-color: #6b5d4d;
   margin-bottom: 0.5rem;
   padding: 0.5rem;
   border-radius: 5px;
@@ -323,15 +324,15 @@ main {
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  box-shadow: 0 0 2px #b0b0b0b4;
+  box-shadow: 0 0 2px #b1a18eb4;
 }
 .task-list li.one-day-left {
   border: 2px solid #ffffff;
   box-shadow: 0 0 5px #ffffff;
 }
 .task-list li.one-hour-left {
-  border: 2px solid red;
-  box-shadow: 0 0 5px red;
+  border: 2px solid #d4a574;
+  box-shadow: 0 0 5px #d4a574;
 }
 .done-checkbox {
   transform: scale(1.3);
@@ -343,16 +344,16 @@ main {
 .task-category {
   font-size: clamp(0.7rem, 2vw, 1rem);
   margin: 0.3rem 0 0.3rem 0;
-  background-color: #4c4c4c;
+  background-color: #8c7d68;
   border-radius: 5px;
-  border: 0.1px solid #676767;
+  border: 0.1px solid #b1a18e;
   min-width: 9rem;
   height: 2rem;
   display: flex;
   justify-content: center;
   align-items: center;
   user-select: none;
-  box-shadow: 0 0 2px #000000;
+  box-shadow: 0 0 2px #2d2820;
 }
 .task-id {
   min-width: 2rem;
@@ -370,35 +371,35 @@ main {
 .deleteBtn {
   padding: 0.3rem 0.6rem;
   font-size: clamp(0.7rem, 2vw, 1rem);
-  color: #232323;
+  color: #2d2820;
   font-weight: bold;
   height: 2rem;
   border-radius: 5px;
   cursor: pointer;
   user-select: none;
   transition: box-shadow 0.3s;
-  border: 1.5px solid #b0b0b0;
-  background-color: #676767;
-  box-shadow: 0 0 2px #000000;
+  border: 1.5px solid #b1a18e;
+  background-color: #8c7d68;
+  box-shadow: 0 0 2px #2d2820;
 }
 .deleteBtn:hover {
-  box-shadow: 0 0 4px #ffffff;
-  border: 1.5px solid #e6e6e6;
-  color: white;
+  box-shadow: 0 0 4px #e5dfd5;
+  border: 1.5px solid #e5dfd5;
+  color: #f5f3ef;
 }
 #notification {
   position: fixed;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  background: #3c3c3c;
-  color: white;
+  background: #6b5d4d;
+  color: #f5f3ef;
   padding: 0.8rem 1rem;
   border-radius: 5px;
   z-index: 1000;
   user-select: none;
-  border: 1px solid #ffffff;
-  box-shadow: 0 0 5px #ffffff;
+  border: 1px solid #e5dfd5;
+  box-shadow: 0 0 5px #e5dfd5;
   font-size: clamp(1rem, 3vw, 1.5rem);
 }
 .show-notification {
@@ -406,29 +407,29 @@ main {
 }
 .about-content,
 .notfound-content {
-  background-color: #2b2b2b;
+  background-color: #4a3f33;
   padding: 2rem;
   border-radius: 5px;
   margin: 1rem auto;
   font-size: clamp(0.9rem, 2vw, 1.1rem);
-  box-shadow: 0 0 5px #b0b0b0b4;
+  box-shadow: 0 0 5px #b1a18eb4;
 }
 .about-h1,
 .notfound-h1 {
   text-align: left;
-  color: white;
+  color: #f5f3ef;
   padding-top: 3rem;
   font-size: clamp(1.5rem, 4vw, 2.5rem);
 }
 .about-content h2 {
   text-align: center;
-  color: white;
+  color: #f5f3ef;
   margin-top: 0;
   font-size: clamp(1.2rem, 3vw, 2rem);
 }
 .about-content h3,
 .notfound-content h3 {
-  color: #b0b0b0;
+  color: #c9bfaf;
   margin-top: 1.5rem;
   font-size: clamp(1rem, 2.5vw, 1.5rem);
 }
@@ -441,7 +442,7 @@ main {
 }
 .notfound-content h1 {
   text-align: center;
-  color: rgb(255, 0, 0);
+  color: #d4a574;
   margin-top: 0;
   font-size: clamp(1.5rem, 4vw, 2.5rem);
 }
@@ -460,16 +461,16 @@ main {
 .btn-back {
   display: inline-block;
   padding: 0.8rem 1.5rem;
-  background-color: #3c3c3c;
-  color: white;
+  background-color: #6b5d4d;
+  color: #f5f3ef;
   text-decoration: none;
   border-radius: 5px;
-  border: 1px solid #b0b0b0;
+  border: 1px solid #b1a18e;
   transition: background-color 0.3s;
   font-size: clamp(0.8rem, 2vw, 1rem);
 }
 .btn-back:hover {
-  background-color: #4c4c4c;
+  background-color: #8c7d68;
 }
 .remove-task {
   animation: fade-out 0.5s ease-in-out forwards;
@@ -509,131 +510,131 @@ main {
 
 @media (prefers-color-scheme: light) {
   body {
-    background-color: #f0f0f0;
-    color: #2b2b2b;
+    background-color: #f5f3ef;
+    color: #4a3f33;
   }
   header {
-    background: linear-gradient(135deg, #626262 0%, #4a90a4 50%, #f2f2f2 100%);
-    color: #ffffff;
+    background: linear-gradient(135deg, #8c7d68 0%, #b1a18e 50%, #e5dfd5 100%);
+    color: #f5f3ef;
   }
   footer {
-    background-color: #d3d3d3;
-    color: #000000;
+    background-color: #c9bfaf;
+    color: #2d2820;
   }
   .nav {
-    background-color: #e0e0e0;
-    border: 1px solid #a0a0a0;
-    box-shadow: 0 0 2px #888888;
+    background-color: #e5dfd5;
+    border: 1px solid #b1a18e;
+    box-shadow: 0 0 2px #8c7d68;
   }
   .nav a {
-    color: #232323;
-    border: 1.5px solid #707070;
-    background-color: #b0b0b0;
-    box-shadow: 0 0 2px #888888;
+    color: #2d2820;
+    border: 1.5px solid #8c7d68;
+    background-color: #c9bfaf;
+    box-shadow: 0 0 2px #8c7d68;
   }
   .nav a:hover {
-    box-shadow: 0 0 5px #000000;
-    border: 1.5px solid #eaeaea;
+    box-shadow: 0 0 5px #4a3f33;
+    border: 1.5px solid #f5f3ef;
   }
   .task-input,
   .task-list {
-    background-color: #d3d3d3;
-    box-shadow: 0 0 5px #707070b4;
+    background-color: #e5dfd5;
+    box-shadow: 0 0 5px #8c7d68b4;
   }
   .new-task-input,
   .priority-input,
   .due-date-input,
   .category-input,
   .add-task-btn {
-    background-color: #e0e0e0;
-    border: 1px solid #707070;
-    color: #2b2b2b;
+    background-color: #f5f3ef;
+    border: 1px solid #8c7d68;
+    color: #4a3f33;
   }
   .new-task-input label,
   .priority-input label,
   .due-date-input label,
   .category-input label {
-    background: radial-gradient(circle, #c0c0c0, #808080);
-    color: #2b2b2b;
+    background: radial-gradient(circle, #c9bfaf, #8c7d68);
+    color: #2d2820;
   }
   .add-task-btn {
-    color: #2b2b2b;
-    border: 1.5px solid #707070;
-    background-color: #b0b0b0;
-    box-shadow: 0 0 2px #888888;
+    color: #2d2820;
+    border: 1.5px solid #8c7d68;
+    background-color: #c9bfaf;
+    box-shadow: 0 0 2px #8c7d68;
   }
   .add-task-btn:hover {
-    box-shadow: 0 0 5px #000000;
-    border: 1.5px solid #eaeaea;
+    box-shadow: 0 0 5px #4a3f33;
+    border: 1.5px solid #f5f3ef;
   }
   .task-list h2 {
-    color: #2b2b2b;
-    background: radial-gradient(circle, #c0c0c0, #808080);
+    color: #2d2820;
+    background: radial-gradient(circle, #c9bfaf, #8c7d68);
   }
   .task-list li {
-    background-color: #e0e0e0;
-    box-shadow: 0 0 2px #707070b4;
+    background-color: #f5f3ef;
+    box-shadow: 0 0 2px #8c7d68b4;
   }
   .task-deadline,
   .task-id,
   .task-priority,
   .task-category {
-    background-color: #c0c0c0;
-    border: 0.1px solid #808080;
-    box-shadow: 0 0 2px #888888;
+    background-color: #c9bfaf;
+    border: 0.1px solid #8c7d68;
+    box-shadow: 0 0 2px #8c7d68;
   }
   .deleteBtn {
-    color: #404040;
-    border: 1.5px solid #707070;
-    background-color: #b0b0b0;
-    box-shadow: 0 0 2px #888888;
+    color: #2d2820;
+    border: 1.5px solid #8c7d68;
+    background-color: #c9bfaf;
+    box-shadow: 0 0 2px #8c7d68;
   }
   .deleteBtn:hover {
-    box-shadow: 0 0 4px #000000;
-    border: 1.5px solid #404040;
-    color: #000000;
+    box-shadow: 0 0 4px #4a3f33;
+    border: 1.5px solid #4a3f33;
+    color: #2d2820;
   }
   .total,
   .completed-tasks {
-    background-color: #c0c0c0;
-    border: 2px solid #808080;
-    box-shadow: 0 0 5px #000000;
+    background-color: #c9bfaf;
+    border: 2px solid #8c7d68;
+    box-shadow: 0 0 5px #4a3f33;
   }
   .sort-count label {
-    border: 1px solid #707070;
-    box-shadow: 0 0 3px #888888;
-    background-color: #c0c0c0;
+    border: 1px solid #8c7d68;
+    box-shadow: 0 0 3px #8c7d68;
+    background-color: #c9bfaf;
   }
   .sort-count label:hover {
-    box-shadow: 0 0 5px #000000;
-    border: 1px solid #404040;
-    background-color: #b0b0b0;
+    box-shadow: 0 0 5px #4a3f33;
+    border: 1px solid #4a3f33;
+    background-color: #b1a18e;
   }
   #notification {
-    background: #e0e0e0;
-    color: #2b2b2b;
-    border: 1px solid #2b2b2b;
-    box-shadow: 0 0 5px #2b2b2b;
+    background: #f5f3ef;
+    color: #2d2820;
+    border: 1px solid #4a3f33;
+    box-shadow: 0 0 5px #4a3f33;
   }
   .about-content,
   .about-content li {
-    color: #000000;
-    background-color: #d3d3d3;
+    color: #2d2820;
+    background-color: #e5dfd5;
   }
   .about-content h2,
   .about-content h3 {
-    color: #2b2b2b;
+    color: #4a3f33;
   }
   .about-content .notfound-content {
-    color: #ffffff;
-    box-shadow: 0 0 5px #000000d7;
+    color: #f5f3ef;
+    box-shadow: 0 0 5px #4a3f33d7;
   }
   .notfound-content {
-    background-color: #d3d3d3;
-    color: #2b2b2b;
+    background-color: #e5dfd5;
+    color: #2d2820;
   }
   .notfound-content h3 {
-    color: #2b2b2b;
+    color: #4a3f33;
   }
 }
 
