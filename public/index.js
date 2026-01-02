@@ -11,6 +11,9 @@ async function loadTasks() {
     if (!response.ok) throw new Error("Failed to load tasks");
     let tasks = await response.json();
     document.getElementById("total-tasks").innerText = tasks.length;
+    document.getElementById("completed-tasks").innerText = tasks.filter(
+      (t) => t.done
+    ).length;
     tasks = tasks.sort((a, b) => {
       if (a.done !== b.done) return a.done - b.done;
       if (sortByIdCheckbox.checked) {
