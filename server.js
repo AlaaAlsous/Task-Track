@@ -12,14 +12,7 @@ let tasks = [];
 let taskId = 1;
 
 if (fs.existsSync("tasks.json")) {
-  try {
-    const data = fs.readFileSync("tasks.json", "utf8");
-    tasks = JSON.parse(data);
-    taskId = tasks.length > 0 ? Math.max(...tasks.map((t) => t.id)) + 1 : 1;
-  } catch {
-    tasks = [];
-    taskId = 1;
-  }
+  loadTasks();
 }
 
 app.get("/index.html", (req, res) => {
@@ -33,10 +26,8 @@ app.get("/api/tasks", (req, res) => {
 app.post("/api/tasks", async (req, res) => {
   try {
     const { taskText, deadline, priority, category } = req.body;
-    if (!taskText || !priority) {
-      return res
-        .status(400)
-        .json({ error: "Task text and priority are required." });
+    if (!taskText) {
+      return res.status(400).json({ error: "Task text are required." });
     }
     const newTask = {
       id: taskId++,
@@ -92,6 +83,17 @@ app.delete("/api/tasks/:id", async (req, res) => {
       .json({ error: "Internal server error. Please try again later." });
   }
 });
+
+async function loadTasks() {
+  try {
+    const data = await fs.promises.readFile("tasks.json", "utf8");
+    tasks = JSON.parse(data);
+    taskId = tasks.length > 0 ? Math.max(...tasks.map((t) => t.id)) + 1 : 1;
+  } catch {
+    tasks = [];
+    taskId = 1;
+  }
+}
 
 async function saveTasks() {
   try {
