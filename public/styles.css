@@ -61,16 +61,20 @@ footer {
 .logo-img {
   grid-area: logo;
   padding: 0.5rem;
-  align-self: center;
-  animation: rotate-logo 20s linear infinite;
-  filter: drop-shadow(0 0 20px #ffffff99);
+  display: inline-block;
+  animation: spin-vertical 5s ease-in-out infinite;
+  filter: drop-shadow(0 0 20px #00000099);
+  transform-style: preserve-3d;
 }
-@keyframes rotate-logo {
-  from {
-    transform: rotate(0deg);
+@keyframes spin-vertical {
+  0% {
+    transform: rotateY(0deg);
   }
-  to {
-    transform: rotate(360deg);
+  50% {
+    transform: rotateY(90deg);
+  }
+  100% {
+    transform: rotateY(0deg);
   }
 }
 header h1 {
@@ -292,7 +296,6 @@ main {
   display: flex;
   align-items: center;
   justify-content: center;
-
   gap: 1.5rem;
   padding: 0.3rem 0.5rem;
   flex-wrap: wrap;
@@ -308,7 +311,7 @@ main {
   border-radius: 5px;
   border: 2px solid #4a3f33;
   width: 10rem;
-  height: 2rem;
+  height: 2.3rem;
   box-shadow: 0 0 5px #e5dfd5;
 }
 .task-list ul {
@@ -600,6 +603,10 @@ main {
     border: 2px solid #8c7d68;
     box-shadow: 0 0 5px #4a3f33;
   }
+  .sort-count {
+    border: 2px solid #8c7d68;
+    box-shadow: 0 0 5px #4a3f33d6;
+  }
   .sort-count label {
     border: 1px solid #8c7d68;
     box-shadow: 0 0 3px #8c7d68;
@@ -625,13 +632,10 @@ main {
   .about-content h3 {
     color: #4a3f33;
   }
-  .about-content .notfound-content {
-    color: #f5f3ef;
-    box-shadow: 0 0 5px #4a3f33d7;
-  }
   .notfound-content {
     background-color: #e5dfd5;
     color: #2d2820;
+    box-shadow: 0 0 5px #4a3f33b4;
   }
   .notfound-content h3 {
     color: #4a3f33;
