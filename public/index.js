@@ -81,7 +81,7 @@ async function loadTasks() {
         ? task.deadline.replace("T", " | ")
         : "No Deadline";
 
-      listItem.innerHTML = `<input type="checkbox" class="done-checkbox" ${
+      listItem.innerHTML = `<input type="checkbox" class="done-checkbox" style="accent-color: #d4a574;" ${
         task.done ? "checked" : ""
       }/> <div class="task-id">${task.id}</div><div class="task-text">${
         task.taskText +
@@ -114,13 +114,13 @@ async function loadTasks() {
           if (isDone) {
             listItem.classList.add("done-task");
             setTimeout(() => {
-              showNotification("Task Completed!");
+              showNotification("✅ Task Completed!");
               loadTasks();
             }, 500);
           } else if (!isDone) {
             listItem.classList.add("undone-task");
             setTimeout(() => {
-              showNotification("Task Uncompleted!");
+              showNotification("❌ Task Unchecked!");
               loadTasks();
             }, 500);
           }
@@ -140,7 +140,7 @@ async function loadTasks() {
           listItem.classList.add("remove-task");
           setTimeout(() => {
             listItem.remove();
-            showNotification("Task Deleted!");
+            showNotification("❌ Task Deleted!");
             loadTasks();
           }, 500);
         } catch (error) {
@@ -186,7 +186,7 @@ async function addTask() {
     deadlineInput.value = "";
     categoryInput.value = "";
     loadTasks();
-    showNotification("Task Added!");
+    showNotification("✅ Task Added!");
     taskTextInput.focus();
   } catch (error) {
     alert("Could not add task. Please try again.");
@@ -225,8 +225,8 @@ sortByCategoryCheckbox.onchange = () => {
 function showNotification(message) {
   const notification = document.getElementById("notification");
   notification.innerText = message;
-  notification.classList.remove("show-notification");
+  notification.classList.remove("hide-notification");
   setTimeout(() => {
-    notification.classList.add("show-notification");
-  }, 3000);
+    notification.classList.add("hide-notification");
+  }, 1500);
 }
