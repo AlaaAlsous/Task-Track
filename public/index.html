@@ -1,9 +1,13 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="sv">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>TaskTrack</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:ital,wght@0,500;1,500&display=swap"
+      rel="stylesheet"
+    />
     <link rel="icon" type="image/png" href="/favicon.png" />
     <link rel="stylesheet" href="styles.css" />
     <script src="index.js" defer></script>
@@ -24,6 +28,7 @@
       <a href="#task-input">Add Task</a>
       <a href="#task-list">View Tasks</a>
       <a href="about.html">About</a>
+      <a href="#" id="auth-link">Log in</a>
     </div>
     <main>
       <section class="task-input" id="task-input">
@@ -89,7 +94,63 @@
         </div>
       </section>
     </main>
-    <footer><p>© 2025 Task Track</p></footer>
+    <footer><p>© 2025 Task Track - MAAS</p></footer>
     <div id="notification" class="hide-notification"></div>
+    <div id="auth-modal" class="modal-overlay" style="display: none">
+      <div class="modal">
+        <div class="modal-header">
+          <h3 id="modal-title">Sign In</h3>
+          <button class="deleteBtn" id="modal-close">X</button>
+        </div>
+        <div class="modal-body">
+          <div id="login-form">
+            <label for="modal-login-username">Username</label>
+            <input
+              id="modal-login-username"
+              type="text"
+              placeholder="Enter Your Username"
+              maxlength="30"
+            />
+            <label for="modal-login-password">Password</label>
+            <input
+              id="modal-login-password"
+              type="password"
+              placeholder="Enter Your Password"
+              maxlength="30"
+            />
+            <div class="modal-actions">
+              <button id="modal-login-btn" class="add-task-btn">Sign In</button>
+              <button id="switch-to-register" class="add-task-btn">
+                Register
+              </button>
+            </div>
+            <div class="error" id="modal-login-error"></div>
+          </div>
+          <div id="register-form" style="display: none">
+            <label for="modal-reg-username">Username</label>
+            <input
+              id="modal-reg-username"
+              type="text"
+              placeholder="Choose Your Username"
+              maxlength="30"
+            />
+            <label for="modal-reg-password">Password</label>
+            <input
+              id="modal-reg-password"
+              type="password"
+              placeholder="Choose Your Password"
+              maxlength="30"
+            />
+            <div class="modal-actions">
+              <button id="modal-register-btn" class="add-task-btn">
+                Create Account
+              </button>
+              <button id="switch-to-login" class="add-task-btn">Back</button>
+            </div>
+            <div class="error" id="modal-register-error"></div>
+          </div>
+        </div>
+      </div>
+    </div>
   </body>
 </html>
