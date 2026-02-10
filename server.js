@@ -2,11 +2,31 @@
 
 import express from "express";
 import fs from "fs";
+import session from "express-session";
+
 const app = express();
-const port = 80;
+const port = process.env.PORT ? Number(process.env.PORT) : 3000;
+
+app.set("trust proxy", 1);
 
 app.use(express.static("public"));
 app.use(express.json());
+
+const isProd = process.env.NODE_ENV === "production";
+app.use(
+  session({
+    name: "sid",
+    secret: process.env.SESSION_SECRET || "dev-secret-change-me",
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+      httpOnly: true,
+      secure: isProd,
+      sameSite: isProd ? "none" : "lax",
+      maxAge: 1000 * 60 * 60 * 24 * 7,
+    },
+  }),
+);
 
 let tasks = [];
 let taskId = 1;
