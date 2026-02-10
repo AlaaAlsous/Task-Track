@@ -3,7 +3,7 @@
 import express from "express";
 import fs from "fs";
 import session from "express-session";
-
+import bcrypt from "bcrypt";
 const app = express();
 const port = process.env.PORT ? Number(process.env.PORT) : 3000;
 
@@ -28,9 +28,56 @@ app.use(
   }),
 );
 
-let tasks = [];
-let taskId = 1;
+const TASKS_DIR = "Users";
+if (!fs.existsSync(TASKS_DIR)) {
+  fs.mkdirSync(TASKS_DIR, { recursive: true });
+}
 
+let users = [];
+
+const USERS_FILE = "users.json";
+if (!fs.existsSync(USERS_FILE)) {
+  fs.writeFileSync(USERS_FILE, "[]");
+}
+loadUsers();
+
+app.get("/index.html", (req, res) => {
+  res.redirect("/");
+});
+
+app.post("/api/auth/register", async (req, res) => {
+  try {
+    const { username, password } = req.body;
+    if (!username || !password) {
+      return res
+        .status(400)
+        .json({ error: "Username and password are required." });
+    }
+    const existing = users.find(
+      (u) => u.username.toLowerCase() === String(username).toLowerCase(),
+    );
+    if (existing) {
+      return res.status(409).json({ error: "User already exists." });
+    }
+    const passwordHash = await bcrypt.hash(String(password), 10);
+    const newUser = {
+      id: users.length > 0 ? Math.max(...users.map((u) => u.id)) + 1 : 1,
+      username: String(username),
+      passwordHash,
+      createdAt: new Date().toISOString(),
+    };
+    users.push(newUser);
+    await saveUsers();
+
+    req.session.userId = newUser.id;
+    res.status(201).json({ id: newUser.id, username: newUser.username });
+  } catch (err) {
+    res.status(500).json({ error: "Internal server error." });
+  }
+});
+app.get("/index.html", (req, res) => {
+  res.redirect("/");
+});
 if (fs.existsSync("tasks.json")) {
   loadTasks();
 }
