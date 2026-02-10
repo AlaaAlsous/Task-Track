@@ -301,6 +301,74 @@ async function loadTasks() {
 }
 loadTasks();
 
+async function doLoginModal() {
+  loginErrorModal.textContent = "";
+  try {
+    const username = document
+      .getElementById("modal-login-username")
+      .value.trim();
+    const password = document
+      .getElementById("modal-login-password")
+      .value.trim();
+    if (!username || !password) {
+      loginErrorModal.textContent = "Please enter your username and password.";
+      return;
+    }
+    const res = await fetch("/api/auth/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+      body: JSON.stringify({ username, password }),
+    });
+    if (!res.ok) {
+      const data = await res.json().catch(() => ({ error: "Login failed" }));
+      loginErrorModal.textContent = data.error || "Login failed";
+      return;
+    }
+    closeAuthModal();
+    await checkAuthAndUpdateNav();
+    loadTasks();
+  } catch (e) {
+    loginErrorModal.textContent = "Technical error. Please try again.";
+  }
+}
+
+async function doRegisterModal() {
+  registerErrorModal.textContent = "";
+  try {
+    const username = document.getElementById("modal-reg-username").value.trim();
+    const password = document.getElementById("modal-reg-password").value.trim();
+    if (!username || !password) {
+      registerErrorModal.textContent =
+        "Please enter your username and password.";
+      return;
+    }
+    const res = await fetch("/api/auth/register", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+      body: JSON.stringify({ username, password }),
+    });
+    if (!res.ok) {
+      const data = await res
+        .json()
+        .catch(() => ({ error: "Registration failed" }));
+      registerErrorModal.textContent = data.error || "Registration failed";
+      return;
+    }
+    closeAuthModal();
+    await checkAuthAndUpdateNav();
+    loadTasks();
+  } catch (e) {
+    registerErrorModal.textContent = "Technical error. Please try again.";
+  }
+}
+
+loginBtnModal.onclick = doLoginModal;
+registerBtnModal.onclick = doRegisterModal;
+
+checkAuthAndUpdateNav();
+
 const taskTextInput = document.getElementById("new-task");
 const priorityInput = document.getElementById("priority");
 const deadlineInput = document.getElementById("due-date");
@@ -319,6 +387,7 @@ async function addTask() {
       headers: {
         "Content-Type": "application/json",
       },
+      credentials: "include",
       body: JSON.stringify({
         taskText: taskText,
         priority: taskPriority ? taskPriority : "Low",
