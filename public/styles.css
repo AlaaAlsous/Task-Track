@@ -742,33 +742,80 @@ main {
   }
   .task-list li {
     background-color: #f5f3ef;
-    box-shadow: 0 0 2px #8c7d68b4;
+    background-image:
+      radial-gradient(120% 100% at 0% 0%, #0000000f 0%, transparent 60%),
+      radial-gradient(100% 120% at 100% 100%, #0000001a 0%, transparent 60%),
+      repeating-linear-gradient(45deg, #00000008 0 2px, #ffffff05 2px 4px);
+    background-blend-mode: overlay, overlay, normal;
+    border: 1px solid #c9bfaf;
+    border-radius: 8px;
+    box-shadow:
+      inset 2px 2px 4px #0000001a,
+      inset -2px -2px 4px #ffffff80,
+      0 1px 3px #8c7d6880;
+  }
+  .task-text {
+    background-color: #c9bfaf;
+    color: #4a3f33;
+    border-radius: 5px;
+    border: 2px solid #8c7d68;
+    box-shadow:
+      inset 2px 2px 4px #0000001a,
+      inset -2px -2px 4px #ffffff80,
+      0 1px 2px #8c7d68aa;
   }
   .task-deadline,
   .task-id,
   .task-priority,
   .task-category {
     background-color: #c9bfaf;
-    border: 0.1px solid #8c7d68;
-    box-shadow: 0 0 2px #8c7d68;
+    border: 2px solid #8c7d68;
+    box-shadow:
+      inset 2px 2px 4px #0000001a,
+      inset -2px -2px 4px #ffffff80,
+      0 1px 2px #8c7d68aa;
     color: #2d2820;
   }
   .deleteBtn {
     color: #2d2820;
-    border: 1.5px solid #8c7d68;
+    border: 2px solid #8c7d68;
     background-color: #c9bfaf;
-    box-shadow: 0 0 2px #8c7d68;
+    box-shadow:
+      inset 2px 2px 4px #0000001a,
+      inset -2px -2px 4px #ffffff80,
+      0 1px 2px #8c7d68aa;
   }
   .deleteBtn:hover {
     box-shadow: 0 0 4px #4a3f33;
-    border: 1.5px solid #4a3f33;
+    border: 2px solid #4a3f33;
+    color: #2d2820;
+  }
+  .editBtn,
+  .saveBtn,
+  .cancelBtn {
+    color: #2d2820;
+    border: 2px solid #8c7d68;
+    background-color: #c9bfaf;
+    box-shadow:
+      inset 2px 2px 4px #0000001a,
+      inset -2px -2px 4px #ffffff80,
+      0 1px 2px #8c7d68aa;
+  }
+  .editBtn:hover,
+  .saveBtn:hover,
+  .cancelBtn:hover {
+    box-shadow: 0 0 4px #4a3f33;
+    border: 2px solid #4a3f33;
     color: #2d2820;
   }
   .total,
   .completed-tasks {
     background-color: #c9bfaf;
     border: 2px solid #8c7d68;
-    box-shadow: 0 0 5px #4a3f33;
+    box-shadow:
+      inset 2px 2px 4px #0000001a,
+      inset -2px -2px 4px #ffffff80,
+      0 1px 2px #8c7d68aa;
   }
   .task-counts span {
     color: #a27d4b;
@@ -778,13 +825,16 @@ main {
     box-shadow: 0 0 5px #4a3f33d6;
   }
   .sort-count label {
-    border: 1px solid #8c7d68;
-    box-shadow: 0 0 3px #8c7d68;
+    border: 2px solid #8c7d68;
+    box-shadow:
+      inset 2px 2px 4px #0000001a,
+      inset -2px -2px 4px #ffffff80,
+      0 1px 2px #8c7d68aa;
     background-color: #c9bfaf;
   }
   .sort-count label:hover {
     box-shadow: 0 0 5px #4a3f33;
-    border: 1px solid #4a3f33;
+    border: 2px solid #4a3f33;
     background-color: #b1a18e;
   }
   #notification {
