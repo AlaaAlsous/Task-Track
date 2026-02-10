@@ -138,6 +138,33 @@ app.get("/api/tasks", requireAuth, async (req, res) => {
   }
 });
 
+
+app.post("/api/tasks", requireAuth, async (req, res) => {
+  try {
+    const { taskText, deadline, priority, category } = req.body;
+    if (!taskText) {
+      return res.status(400).json({ error: "Task text is required." });
+    }
+    const tasks = await loadUserTasks(req.session.userId);
+    const nextId =
+      tasks.length > 0 ? Math.max(...tasks.map((t) => t.id)) + 1 : 1;
+    const newTask = {
+      id: nextId,
+      taskText,
+      priority,
+      deadline: deadline || null,
+      category,
+      done: false,
+    };
+    tasks.push(newTask);
+    await saveUserTasks(req.session.userId, tasks);
+    res.status(201).json(newTask);
+  } catch {
+    res
+      .status(500)
+      .json({ error: "Internal server error. Please try again later." });
+  }
+});
 app.get("/index.html", (req, res) => {
   res.redirect("/");
 });
