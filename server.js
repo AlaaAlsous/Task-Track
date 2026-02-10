@@ -75,6 +75,36 @@ app.post("/api/auth/register", async (req, res) => {
     res.status(500).json({ error: "Internal server error." });
   }
 });
+
+app.post("/api/auth/login", async (req, res) => {
+  try {
+    const { username, password } = req.body;
+    if (!username || !password) {
+      return res
+        .status(400)
+        .json({ error: "Username and password are required." });
+    }
+    const user = users.find(
+      (u) => u.username.toLowerCase() === String(username).toLowerCase(),
+    );
+    if (!user) {
+      return res
+        .status(401)
+        .json({ error: "Username or password is incorrect." });
+    }
+    const valid = await bcrypt.compare(String(password), user.passwordHash);
+    if (!valid) {
+      return res
+        .status(401)
+        .json({ error: "Username or password is incorrect." });
+    }
+    req.session.userId = user.id;
+    res.json({ id: user.id, username: user.username });
+  } catch (err) {
+    res.status(500).json({ error: "Internal server error." });
+  }
+}); 
+
 app.get("/index.html", (req, res) => {
   res.redirect("/");
 });
