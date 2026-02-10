@@ -34,6 +34,36 @@ authLink.onclick = (e) => {
   openAuthModal("login");
 };
 
+async function checkAuthAndUpdateNav() {
+  try {
+    const res = await fetch("/api/auth/me", { credentials: "include" });
+    if (!res.ok) throw new Error("Not authed");
+    const me = await res.json();
+    authLink.textContent = `Sign Out (${me.username})`;
+    authLink.onclick = async (e) => {
+      e.preventDefault();
+      try {
+        await fetch("/api/auth/logout", {
+          method: "POST",
+          credentials: "include",
+        });
+      } catch {}
+      authLink.textContent = "Sign In";
+      authLink.onclick = (ev) => {
+        ev.preventDefault();
+        openAuthModal("login");
+      };
+      loadTasks();
+    };
+  } catch {
+    authLink.textContent = "Sign In";
+    authLink.onclick = (e) => {
+      e.preventDefault();
+      openAuthModal("login");
+    };
+  }
+}
+
 async function loadTasks() {
   try {
     const response = await fetch("/api/tasks");
