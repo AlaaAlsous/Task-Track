@@ -105,6 +105,21 @@ app.post("/api/auth/login", async (req, res) => {
   }
 }); 
 
+app.post("/api/auth/logout", (req, res) => {
+  req.session.destroy((err) => {
+    if (err) return res.status(500).json({ error: "Could not logout." });
+    res.clearCookie("sid");
+    res.status(204).end();
+  });
+});
+
+app.get("/api/auth/me", (req, res) => {
+  const user = users.find((u) => u.id === req.session.userId);
+  if (!user)
+    return res.status(401).json({ error: "The user is not logged in." });
+  res.json({ id: user.id, username: user.username });
+});
+
 app.get("/index.html", (req, res) => {
   res.redirect("/");
 });
