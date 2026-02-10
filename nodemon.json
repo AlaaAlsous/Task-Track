@@ -1,0 +1,6 @@
+{
+  "watch": ["server.js", "public/**/*"],
+  "ignore": ["users.json", "users/*.json"],
+  "ext": "js,mjs,cjs,html,css",
+  "delay": "300ms"
+}
