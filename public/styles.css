@@ -324,25 +324,37 @@ main {
   font-weight: 500;
   background-color: #6b5d4d;
   border-radius: 5px;
-  border: 2.5px solid #4a3f33c9;
+  border: 2px solid #b1a18e;
   width: 10rem;
   height: 2.3rem;
-  box-shadow: 0 0 5px #e5dfd5;
+  box-shadow:
+    inset 2px 2px 4px #00000033,
+    inset -2px -2px 4px #ffffff1a,
+    0 1px 3px #00000066;
 }
 .task-list ul {
   list-style: none;
-  padding: 0 2rem 0 2rem;
+  padding: 0 1rem 0 1rem;
 }
 .task-list li {
   background-color: #6b5d4d;
+  background-image:
+    radial-gradient(120% 100% at 0% 0%, #ffffff14 0%, transparent 60%),
+    radial-gradient(100% 120% at 100% 100%, #00000026 0%, transparent 60%),
+    repeating-linear-gradient(45deg, #0000000b 0 2px, #ffffff0a 2px 4px);
+  background-blend-mode: overlay, overlay, normal;
   margin-bottom: 0.5rem;
   padding: 0.5rem;
-  border-radius: 5px;
+  border-radius: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  box-shadow: 0 0 2px #b1a18eb4;
+  border: 1px solid #3d352c;
+  box-shadow:
+    inset 2px 2px 4px #00000033,
+    inset -2px -2px 4px #ffffff1a,
+    0 1px 3px #00000066;
 }
 .task-list li.one-day-left {
   border: 2px solid #ffffff;
@@ -360,10 +372,10 @@ main {
 .task-id,
 .task-priority,
 .task-category {
-  font-size: clamp(0.7rem, 2vw, 1rem);
+  font-size: clamp(0.8rem, 3vw, 1rem);
   margin: 0.3rem 0 0.3rem 0;
   background-color: #8c7d68;
-  color: #f5f3ef;
+  color: #3b332a;
   border-radius: 5px;
   border: 2px solid #b1a18e;
   min-width: 9rem;
@@ -372,7 +384,10 @@ main {
   justify-content: center;
   align-items: center;
   user-select: none;
-  box-shadow: 0 0 2px #2d2820;
+  box-shadow:
+    inset 2px 2px 4px #00000033,
+    inset -2px -2px 4px #ffffff1a,
+    0 1px 3px #00000066;
 }
 .task-id {
   min-width: 2rem;
@@ -384,15 +399,33 @@ main {
   min-width: 6.5rem;
 }
 .task-text {
-  font-size: clamp(0.7rem, 2vw, 1.2rem);
-  margin: 0.3rem auto 0.3rem 0.3rem;
+  font-size: clamp(1rem, 3vw, 1.2rem);
+  margin: 0.3rem auto 0.3rem 0;
+  background-color: #8c7d68;
+  color: #3b332a;
+  border-radius: 5px;
+  padding: 0 0.5rem;
+  flex: 1;
+  border: 2px solid #b1a18e;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-height: 2rem;
+  box-shadow:
+    inset 2px 2px 4px #00000029,
+    inset -2px -2px 4px #ffffff1a,
+    0 1px 2px #2d2820aa;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  white-space: normal;
+  max-width: 100%;
 }
 .task-text span {
   user-select: none;
 }
 .deleteBtn {
   padding: 0.3rem 0.6rem;
-  font-size: clamp(0.7rem, 2vw, 1rem);
+  font-size: clamp(0.8rem, 3vw, 1rem);
   color: #2d2820;
   font-weight: bold;
   height: 2rem;
@@ -400,13 +433,40 @@ main {
   cursor: pointer;
   user-select: none;
   transition: box-shadow 0.3s;
-  border: 1.5px solid #b1a18e;
+  border: 2px solid #b1a18e;
   background-color: #8c7d68;
-  box-shadow: 0 0 2px #2d2820;
+  box-shadow:
+    0 0 3px #2d2820,
+    0 0 5px #2d2820b4;
 }
 .deleteBtn:hover {
   box-shadow: 0 0 4px #e5dfd5;
-  border: 1.5px solid #e5dfd5;
+  border: 2px solid #e5dfd5;
+  color: #f5f3ef;
+}
+.editBtn,
+.saveBtn,
+.cancelBtn {
+  padding: 0.3rem 0.6rem;
+  font-size: clamp(0.8rem, 3vw, 1rem);
+  color: #2d2820;
+  font-weight: bold;
+  height: 2rem;
+  border-radius: 5px;
+  cursor: pointer;
+  user-select: none;
+  transition: box-shadow 0.3s;
+  border: 2px solid #b1a18e;
+  background-color: #8c7d68;
+  box-shadow:
+    0 0 3px #2d2820,
+    0 0 5px #2d2820b4;
+}
+.editBtn:hover,
+.saveBtn:hover,
+.cancelBtn:hover {
+  box-shadow: 0 0 4px #e5dfd5;
+  border: 2px solid #e5dfd5;
   color: #f5f3ef;
 }
 #notification {
