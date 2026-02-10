@@ -1,9 +1,16 @@
 "use strict";
 
-const taskList = document.getElementById("tasks");
-const sortByIdCheckbox = document.getElementById("sortById");
-const sortByPriorityCheckbox = document.getElementById("sortByPriority");
-const sortByCategoryCheckbox = document.getElementById("sortByCategory");
+const authLink = document.getElementById("auth-link");
+const authModal = document.getElementById("auth-modal");
+const modalClose = document.getElementById("modal-close");
+const loginForm = document.getElementById("login-form");
+const registerForm = document.getElementById("register-form");
+const switchToRegister = document.getElementById("switch-to-register");
+const switchToLogin = document.getElementById("switch-to-login");
+const loginBtnModal = document.getElementById("modal-login-btn");
+const registerBtnModal = document.getElementById("modal-register-btn");
+const loginErrorModal = document.getElementById("modal-login-error");
+const registerErrorModal = document.getElementById("modal-register-error");
 
 async function loadTasks() {
   try {
