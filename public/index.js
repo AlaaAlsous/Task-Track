@@ -1,5 +1,4 @@
 "use strict";
-
 const authLink = document.getElementById("auth-link");
 const authModal = document.getElementById("auth-modal");
 const modalClose = document.getElementById("modal-close");
@@ -11,6 +10,29 @@ const loginBtnModal = document.getElementById("modal-login-btn");
 const registerBtnModal = document.getElementById("modal-register-btn");
 const loginErrorModal = document.getElementById("modal-login-error");
 const registerErrorModal = document.getElementById("modal-register-error");
+
+function openAuthModal(mode = "login") {
+  if (mode === "login") {
+    loginForm.style.display = "block";
+    registerForm.style.display = "none";
+    document.getElementById("modal-title").innerText = "Sign In";
+  } else {
+    loginForm.style.display = "none";
+    registerForm.style.display = "block";
+    document.getElementById("modal-title").innerText = "Register";
+  }
+  authModal.style.display = "flex";
+}
+function closeAuthModal() {
+  authModal.style.display = "none";
+}
+modalClose.onclick = closeAuthModal;
+switchToRegister.onclick = () => openAuthModal("register");
+switchToLogin.onclick = () => openAuthModal("login");
+authLink.onclick = (e) => {
+  e.preventDefault();
+  openAuthModal("login");
+};
 
 async function loadTasks() {
   try {
