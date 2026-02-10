@@ -120,6 +120,24 @@ app.get("/api/auth/me", (req, res) => {
   res.json({ id: user.id, username: user.username });
 });
 
+function requireAuth(req, res, next) {
+  if (!req.session.userId) {
+    return res.status(401).json({ error: "The user is not logged in." });
+  }
+  next();
+}
+
+app.get("/api/tasks", requireAuth, async (req, res) => {
+  try {
+    const tasks = await loadUserTasks(req.session.userId);
+    res.json(tasks);
+  } catch {
+    res
+      .status(500)
+      .json({ error: "Internal server error. Please try again later." });
+  }
+});
+
 app.get("/index.html", (req, res) => {
   res.redirect("/");
 });
