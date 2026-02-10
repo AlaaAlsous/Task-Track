@@ -204,18 +204,64 @@ app.post("/api/tasks", async (req, res) => {
   }
 });
 
-app.patch("/api/tasks/:id", async (req, res) => {
+app.patch("/api/tasks/:id", requireAuth, async (req, res) => {
   try {
     const taskId = Number(req.params.id);
-    const { done } = req.body;
+    const { done, taskText, priority, deadline, category } = req.body;
+    const tasks = await loadUserTasks(req.session.userId);
     for (let i = 0; i < tasks.length; i++) {
       if (tasks[i].id === taskId) {
-        tasks[i].done = done;
-        await saveTasks();
+        if (typeof done === "boolean") {
+          tasks[i].done = done;
+        }
+        if (typeof taskText === "string") {
+          const trimmed = taskText.trim();
+          if (!trimmed) {
+            return res.status(400).json({ error: "Task text is required." });
+          }
+          tasks[i].taskText = trimmed;
+        }
+        if (typeof priority === "string") {
+          const allowedPriorities = new Set(["Low", "Medium", "High"]);
+          if (!allowedPriorities.has(priority)) {
+            return res.status(400).json({ error: "Invalid priority value." });
+          }
+          tasks[i].priority = priority;
+        }
+        if (category !== undefined) {
+          if (category === null) {
+            tasks[i].category = "No Category";
+          } else if (typeof category === "string") {
+            const allowedCategories = new Set([
+              "Private",
+              "Work",
+              "School",
+              "No Category",
+            ]);
+            if (!allowedCategories.has(category)) {
+              return res.status(400).json({ error: "Invalid category value." });
+            }
+            tasks[i].category = category;
+          }
+        }
+        if (deadline !== undefined) {
+          if (deadline === null || deadline === "") {
+            tasks[i].deadline = null;
+          } else if (typeof deadline === "string") {
+            const valid = /\d{4}-\d{2}-\d{2}T\d{2}:\d{2}/.test(deadline);
+            if (!valid) {
+              return res
+                .status(400)
+                .json({ error: "Invalid deadline format." });
+            }
+            tasks[i].deadline = deadline;
+          }
+        }
+        await saveUserTasks(req.session.userId, tasks);
         return res.json(tasks[i]);
       }
     }
-    res.status(404).json({ error: "Task not found" });
+    res.status(404).json({ error: "Task not found." });
   } catch {
     res
       .status(500)
