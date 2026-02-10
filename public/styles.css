@@ -864,7 +864,7 @@ main {
 
 @media (max-width: 768px) {
   .task-list ul {
-    padding: 0 0.5rem;
+    padding: 0;
   }
   .task-list li {
     flex-wrap: wrap;
@@ -911,10 +911,21 @@ main {
 
 @media (max-width: 480px) {
   .task-list ul {
-    padding: 0 0.5rem;
+    padding: 0;
+  }
+  .logo-img {
+    height: 90px;
+  }
+  header h1 {
+    padding: 0 1rem;
+  }
+  header h4 {
+    padding: 0 1rem 0 2rem;
+    font-size: clamp(0.8rem, 3vw, 1.2rem);
   }
   .task-list li {
     flex-wrap: wrap;
+    gap: 0.3rem;
   }
   .done-checkbox {
     order: 1;
@@ -922,22 +933,30 @@ main {
   .task-text {
     order: 3;
     flex: 1;
-    min-width: 15rem;
+    min-width: 10rem;
   }
   .deleteBtn {
+    order: 8;
+    min-width: 2rem;
+  }
+  .editBtn {
     order: 7;
   }
   .task-id {
     order: 2;
+    min-width: 2rem;
   }
   .task-priority {
     order: 4;
+    min-width: 3.5rem;
   }
   .task-category {
     order: 5;
+    min-width: 5rem;
   }
   .task-deadline {
     order: 6;
+    min-width: 7rem;
   }
   .sort-count {
     grid-template-columns: 1fr;
@@ -950,6 +969,13 @@ main {
   .nav {
     gap: 1rem;
   }
+  .total,
+  .completed-tasks {
+    width: 8rem;
+  }
+  .task-counts {
+    gap: 1rem;
+  }
   .task-input {
     grid-template-columns: 1fr;
     grid-template-areas:
@@ -958,5 +984,9 @@ main {
       "due-date"
       "category"
       "add-btn";
+  }
+  .about-h1 {
+    text-align: center;
+    padding: 2rem 0;
   }
 }
