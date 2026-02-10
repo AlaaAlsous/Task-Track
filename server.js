@@ -103,7 +103,7 @@ app.post("/api/auth/login", async (req, res) => {
   } catch (err) {
     res.status(500).json({ error: "Internal server error." });
   }
-}); 
+});
 
 app.post("/api/auth/logout", (req, res) => {
   req.session.destroy((err) => {
@@ -138,7 +138,6 @@ app.get("/api/tasks", requireAuth, async (req, res) => {
   }
 });
 
-
 app.post("/api/tasks", requireAuth, async (req, res) => {
   try {
     const { taskText, deadline, priority, category } = req.body;
@@ -158,44 +157,6 @@ app.post("/api/tasks", requireAuth, async (req, res) => {
     };
     tasks.push(newTask);
     await saveUserTasks(req.session.userId, tasks);
-    res.status(201).json(newTask);
-  } catch {
-    res
-      .status(500)
-      .json({ error: "Internal server error. Please try again later." });
-  }
-});
-app.get("/index.html", (req, res) => {
-  res.redirect("/");
-});
-if (fs.existsSync("tasks.json")) {
-  loadTasks();
-}
-
-app.get("/index.html", (req, res) => {
-  res.redirect("/");
-});
-
-app.get("/api/tasks", (req, res) => {
-  res.json(tasks);
-});
-
-app.post("/api/tasks", async (req, res) => {
-  try {
-    const { taskText, deadline, priority, category } = req.body;
-    if (!taskText) {
-      return res.status(400).json({ error: "Task text are required." });
-    }
-    const newTask = {
-      id: taskId++,
-      taskText,
-      priority,
-      deadline: deadline || null,
-      category,
-      done: false,
-    };
-    tasks.push(newTask);
-    await saveTasks();
     res.status(201).json(newTask);
   } catch {
     res
@@ -269,13 +230,14 @@ app.patch("/api/tasks/:id", requireAuth, async (req, res) => {
   }
 });
 
-app.delete("/api/tasks/:id", async (req, res) => {
+app.delete("/api/tasks/:id", requireAuth, async (req, res) => {
   try {
     const taskId = Number(req.params.id);
+    const tasks = await loadUserTasks(req.session.userId);
     for (let i = 0; i < tasks.length; i++) {
       if (tasks[i].id === taskId) {
         tasks.splice(i, 1);
-        await saveTasks();
+        await saveUserTasks(req.session.userId, tasks);
         return res.status(204).end();
       }
     }
@@ -287,20 +249,42 @@ app.delete("/api/tasks/:id", async (req, res) => {
   }
 });
 
-async function loadTasks() {
+function getUserTasksPath(userId) {
+  return `${TASKS_DIR}/${userId}.json`;
+}
+
+async function loadUserTasks(userId) {
   try {
-    const data = await fs.promises.readFile("tasks.json", "utf8");
-    tasks = JSON.parse(data);
-    taskId = tasks.length > 0 ? Math.max(...tasks.map((t) => t.id)) + 1 : 1;
+    const p = getUserTasksPath(userId);
+    const data = await fs.promises.readFile(p, "utf8");
+    return JSON.parse(data);
   } catch {
-    tasks = [];
-    taskId = 1;
+    return [];
   }
 }
 
-async function saveTasks() {
+async function saveUserTasks(userId, tasks) {
   try {
-    await fs.promises.writeFile("tasks.json", JSON.stringify(tasks));
+    const p = getUserTasksPath(userId);
+    await fs.promises.writeFile(p, JSON.stringify(tasks));
+  } catch (error) {
+    throw error;
+  }
+}
+
+async function loadUsers() {
+  try {
+    const data = await fs.promises.readFile(USERS_FILE, "utf8");
+    const trimmed = data.trim();
+    users = trimmed ? JSON.parse(trimmed) : [];
+  } catch {
+    users = [];
+  }
+}
+
+async function saveUsers() {
+  try {
+    await fs.promises.writeFile(USERS_FILE, JSON.stringify(users));
   } catch (error) {
     throw error;
   }
