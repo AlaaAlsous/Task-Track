@@ -4,6 +4,7 @@ import express from "express";
 import fs from "fs";
 import session from "express-session";
 import bcrypt from "bcrypt";
+import path from "node:path";
 const app = express();
 const port = process.env.PORT ? Number(process.env.PORT) : 3000;
 
@@ -141,18 +142,25 @@ app.get("/api/tasks", requireAuth, async (req, res) => {
 app.post("/api/tasks", requireAuth, async (req, res) => {
   try {
     const { taskText, deadline, priority, category } = req.body;
-    if (!taskText) {
+    if (!taskText || !String(taskText).trim()) {
       return res.status(400).json({ error: "Task text is required." });
     }
+    const allowedPriorities = new Set(["Low", "Medium", "High"]);
+    const allowedCategories = new Set([
+      "Private",
+      "Work",
+      "School",
+      "No Category",
+    ]);
     const tasks = await loadUserTasks(req.session.userId);
     const nextId =
       tasks.length > 0 ? Math.max(...tasks.map((t) => t.id)) + 1 : 1;
     const newTask = {
       id: nextId,
-      taskText,
-      priority,
+      taskText: String(taskText).trim(),
+      priority: allowedPriorities.has(priority) ? priority : "Low",
       deadline: deadline || null,
-      category,
+      category: allowedCategories.has(category) ? category : "No Category",
       done: false,
     };
     tasks.push(newTask);
@@ -250,7 +258,7 @@ app.delete("/api/tasks/:id", requireAuth, async (req, res) => {
 });
 
 function getUserTasksPath(userId) {
-  return `${TASKS_DIR}/${userId}.json`;
+  return path.join(TASKS_DIR, `${userId}.json`);
 }
 
 async function loadUserTasks(userId) {
