@@ -12,7 +12,7 @@ html {
 body {
   min-height: 100%;
   margin: 0;
-  font-family: "Gill Sans", "Gill Sans MT", Calibri, "Trebuchet MS", sans-serif;
+  font-family: "Roboto Condensed", sans-serif;
   line-height: 1.6;
   font-size: clamp(0.9rem, 2vw, 1rem);
   background-color: #2d2820;
@@ -81,7 +81,9 @@ header h1 {
   margin: 0;
   padding: 0 2rem;
   align-self: flex-end;
-  text-shadow: 2px 2px 4px #2d2820c3, 0 0 20px #b1a18e55;
+  text-shadow:
+    2px 2px 4px #2d2820c3,
+    0 0 20px #b1a18e55;
   font-weight: 700;
   letter-spacing: 2px;
 }
@@ -93,7 +95,7 @@ header h4 {
   letter-spacing: 1px;
   color: #e5dfd5;
   margin: 0;
-  padding: 0 2rem;
+  padding: 0 4rem;
   align-self: flex-start;
   animation: slide-in 2s ease-out;
 }
@@ -131,10 +133,14 @@ footer {
   font-size: clamp(0.8rem, 2vw, 1rem);
   padding: 0.1rem 0.6rem;
   border-radius: 5px;
-  transition: box-shadow 0.3s, transform 0.3s;
+  transition:
+    box-shadow 0.3s,
+    transform 0.3s;
   border: 2px solid #c9bfaf;
   background-color: #b1a18e;
-  box-shadow: 0 0 3px #2d2820, 0 0 5px #2d2820b4;
+  box-shadow:
+    0 0 3px #2d2820,
+    0 0 5px #2d2820b4;
 }
 .nav a:hover {
   box-shadow: 0 0 5px #e5dfd5;
@@ -165,7 +171,7 @@ main {
   padding: 1rem;
   background-color: #4a3f33;
   border-radius: 5px;
-  scroll-margin-top: 4rem;
+  scroll-margin-top: 6rem;
   box-shadow: 0 0 5px #b1a18eb4;
 }
 .new-task-input,
@@ -226,7 +232,9 @@ main {
   user-select: none;
   border: 2px solid #c9bfaf;
   background-color: #b1a18e;
-  box-shadow: 0 0 3px #2d2820, 0 0 5px #2d2820b4;
+  box-shadow:
+    0 0 3px #2d2820,
+    0 0 5px #2d2820b4;
   transition: box-shadow 0.3s;
 }
 .add-task-btn:hover {
@@ -240,7 +248,7 @@ main {
   padding: 1rem;
   border-radius: 5px;
   overflow-y: auto;
-  scroll-margin-top: 4rem;
+  scroll-margin-top: 6rem;
   box-shadow: 0 0 5px #b1a18eb4;
 }
 .task-list h2 {
@@ -272,15 +280,20 @@ main {
   gap: 0.4rem;
   justify-content: right;
   padding: 0.3rem 0.5rem;
-  border: 1px solid #b1a18e;
+  border: 2px solid #b1a18e;
   border-radius: 5px;
-  box-shadow: 0 0 3px #e5dfd599;
-  transition: box-shadow 0.3s, border 0.3s;
+  box-shadow:
+    inset 2px 2px 4px #00000033,
+    inset -2px -2px 4px #ffffff1a,
+    0 1px 3px #00000066;
+  transition:
+    box-shadow 0.3s,
+    border 0.3s;
   cursor: pointer;
 }
 .sort-count label:hover {
   box-shadow: 0 0 5px #e5dfd5d6;
-  border: 1px solid #e5dfd5;
+  border: 2px solid #e5dfd5;
   background-color: #b1a18e;
 }
 #sortById,
