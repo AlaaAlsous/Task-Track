@@ -64,14 +64,23 @@ async function checkAuthAndUpdateNav() {
   }
 }
 
+const taskList = document.getElementById("tasks");
+const sortByIdCheckbox = document.getElementById("sortById");
+const sortByPriorityCheckbox = document.getElementById("sortByPriority");
+const sortByCategoryCheckbox = document.getElementById("sortByCategory");
+
 async function loadTasks() {
   try {
-    const response = await fetch("/api/tasks");
+    const response = await fetch("/api/tasks", { credentials: "include" });
+    if (response.status === 401) {
+      openAuthModal("login");
+      return;
+    }
     if (!response.ok) throw new Error("Failed to load tasks");
     let tasks = await response.json();
     document.getElementById("total-tasks").innerText = tasks.length;
     document.getElementById("completed-tasks").innerText = tasks.filter(
-      (t) => t.done
+      (t) => t.done,
     ).length;
     tasks = tasks.sort((a, b) => {
       if (a.done !== b.done) return a.done - b.done;
@@ -144,11 +153,11 @@ async function loadTasks() {
         task.done ? "checked" : ""
       }/> <div class="task-id">${task.id}</div><div class="task-text">${
         task.taskText +
-        (timeIsUp ? "<span style = color:#750000> (Expired!)</span>" : "")
+        (timeIsUp ? "<span style = color:#750000> Expired!</span>" : "")
       }</div> <div class="task-deadline">${formattedDeadline}</div>  <div class="task-category">${
         task.category
       }</div><div class="task-priority">${task.priority}</div>
-      <button class="deleteBtn">X</button>`;
+      <button class="editBtn">Edit</button><button class="deleteBtn">X</button>`;
 
       if (oneDayLeft) {
         listItem.classList.add("one-day-left");
@@ -167,6 +176,7 @@ async function loadTasks() {
           const response = await fetch(`/api/tasks/${task.id}`, {
             method: "PATCH",
             headers: { "Content-Type": "application/json" },
+            credentials: "include",
             body: JSON.stringify({ done: isDone }),
           });
           if (!response.ok) throw new Error("Failed to update task");
@@ -185,7 +195,7 @@ async function loadTasks() {
           }
         } catch (error) {
           alert("Could not update task. Please try again.");
-          isDone = !isDone;
+          e.target.checked = !e.target.checked;
         }
       };
 
@@ -194,6 +204,7 @@ async function loadTasks() {
         try {
           const response = await fetch(`/api/tasks/${task.id}`, {
             method: "DELETE",
+            credentials: "include",
           });
           if (!response.ok) throw new Error("Failed to delete task");
           listItem.classList.add("remove-task");
@@ -205,6 +216,82 @@ async function loadTasks() {
         } catch (error) {
           alert("Could not delete task. Please try again.");
         }
+      };
+
+      const editBtn = listItem.querySelector(".editBtn");
+      editBtn.onclick = () => {
+        const deadlineValue = task.deadline ? task.deadline : "";
+        listItem.innerHTML = `
+          <div class="task-id">${task.id}</div>
+          <input id="edit-text" type="text" maxlength="100" style="outline:none;" value="${task.taskText.replace(
+            /"/g,
+            "&quot;",
+          )}" class="task-text" />
+          <input id="edit-deadline" type="datetime-local" value="${deadlineValue}" class="task-deadline" />
+          <select id="edit-category" class="task-category">
+            <option value="Private" ${
+              task.category === "Private" ? "selected" : ""
+            }>Private</option>
+            <option value="Work" ${
+              task.category === "Work" ? "selected" : ""
+            }>Work</option>
+            <option value="School" ${
+              task.category === "School" ? "selected" : ""
+            }>School</option>
+            <option value="No Category" ${
+              task.category === "No Category" ? "selected" : ""
+            }>No Category</option>
+          </select>
+          <select id="edit-priority" class="task-priority">
+            <option value="Low" ${
+              task.priority === "Low" ? "selected" : ""
+            }>Low</option>
+            <option value="Medium" ${
+              task.priority === "Medium" ? "selected" : ""
+            }>Medium</option>
+            <option value="High" ${
+              task.priority === "High" ? "selected" : ""
+            }>High</option>
+          </select>
+          <button class="saveBtn">Save</button>
+          <button class="cancelBtn">Cancel</button>
+        `;
+
+        const saveBtn = listItem.querySelector(".saveBtn");
+        const cancelBtn = listItem.querySelector(".cancelBtn");
+
+        saveBtn.onclick = async () => {
+          const newText = listItem.querySelector("#edit-text").value.trim();
+          const newDeadline = listItem.querySelector("#edit-deadline").value;
+          const newCategory = listItem.querySelector("#edit-category").value;
+          const newPriority = listItem.querySelector("#edit-priority").value;
+
+          if (!newText) {
+            return;
+          }
+          try {
+            const response = await fetch(`/api/tasks/${task.id}`, {
+              method: "PATCH",
+              headers: { "Content-Type": "application/json" },
+              credentials: "include",
+              body: JSON.stringify({
+                taskText: newText,
+                deadline: newDeadline ? newDeadline : null,
+                category: newCategory,
+                priority: newPriority,
+              }),
+            });
+            if (!response.ok) throw new Error("Failed to update task");
+            showNotification("✏️ Task Updated!");
+            loadTasks();
+          } catch (error) {
+            alert("Could not update task. Please try again.");
+          }
+        };
+
+        cancelBtn.onclick = () => {
+          loadTasks();
+        };
       };
       taskList.appendChild(listItem);
     }
