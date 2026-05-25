@@ -860,6 +860,9 @@ main {
   .notfound-content h3 {
     color: #4a3f33;
   }
+  .modal-body p {
+    color: wheat;
+  }
 }
 
 @media (max-width: 768px) {

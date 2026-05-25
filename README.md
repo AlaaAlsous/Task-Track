@@ -3,22 +3,38 @@
 ![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?logo=javascript&logoColor=black)
 ![Node.js](https://img.shields.io/badge/Node.js-43853D?logo=node.js&logoColor=white)
 ![Express](https://img.shields.io/badge/Express-000000?logo=express&logoColor=white)
+![Azure](https://img.shields.io/badge/Azure-0078D4?logo=microsoftazure&logoColor=white)
+![Azure SQL](https://img.shields.io/badge/Azure%20SQL-0089D6?logo=microsoftsqlserver&logoColor=white)
+![Key Vault](https://img.shields.io/badge/Key%20Vault-4B53BC?logo=microsoftazure&logoColor=white)
 ![HTML5](https://img.shields.io/badge/HTML5-E34F26?logo=html5&logoColor=white)
 ![CSS3](https://img.shields.io/badge/CSS3-1572B6?logo=css3&logoColor=white)
 ![VS Code](https://img.shields.io/badge/VS%20Code-007ACC?logo=visualstudiocode&logoColor=white)
 ![Nodemon](https://img.shields.io/badge/nodemon-76D04B?logo=nodemon&logoColor=white)
 ![License](https://img.shields.io/badge/License-MIT-green)
 
+<p align="center">
+  <img src="public/Assets/task-track-login.png" alt="Inloggning" width="250"/>
+</p>
+
+<p align="center">
+  <img src="public/Assets/task-track-home.png" alt="Startsida" width="600"/>
+</p>
+
 ## Beskrivning
 
-Task Track är en komplett fullstack-applikation för att hantera personliga uppgifter (to-dos). Backend är byggd i Express (Node.js) med sessionsbaserad inloggning, och frontend är en ren HTML/CSS/JS-klient som körs som statisk resurs. Varje användare lagras i en central fil (users.json) och får sina uppgifter sparade separat i Users/<userId>.json. Systemet stödjer inloggning/utloggning, skapande/redigering/borttagning av uppgifter, markering som klara, sortering, kategorier och deadlines med visuella varningar när 1 dag eller 1 timme återstår.
+Task Track är en komplett fullstack-applikation för att hantera personliga uppgifter (to-dos). Backend är byggd i Express (Node.js) och använder Azure SQL Database för lagring av användare och uppgifter. Frontend är en ren HTML/CSS/JS-klient som körs som statisk resurs på Azure Web App. Systemet stödjer inloggning/utloggning, skapande/redigering/borttagning av uppgifter, markering som klara, sortering, kategorier och deadlines med visuella varningar när 1 dag eller 1 timme återstår.
 
-Arkitekturen är avsiktligt enkel och filbaserad, vilket gör den lätt att köra lokalt utan externa databaser. Sessionscookies används för autentisering, och API:t är tydligt uppdelat i auth-endpoints och tasks-endpoints. Frontenden pratar med API:t via fetch-anrop och renderar listor, formulär och notifieringar direkt i DOM.
+**Arkitektur och Azure-integration:**
 
-Backend-exponeringen består av två huvudsakliga delar:
+- **Databas:** Alla användare och uppgifter lagras i en Azure SQL Database istället för lokala JSON-filer.
+- **Key Vault:** Hemligheter som `SESSIONSECRET` och `SqlConnectionString` hämtas säkert från Azure Key Vault (`kv-task-track`).
+- **Deployment:** Applikationen är anpassad för Azure Web App och kan deployas automatiskt med `Deploy.ps1` (PowerShell-script) som zippar och laddar upp koden.
+- **Sessions:** Sessionscookies används för autentisering. API:t är uppdelat i auth-endpoints och tasks-endpoints. Frontenden kommunicerar med API:t via fetch-anrop och renderar listor, formulär och notifieringar direkt i DOM.
 
-- Autentisering (`/api/auth/*`): Registrering hashar lösenord med bcrypt (cost 10) och sparar användare i `users.json`. Inloggning verifierar hash och sätter en sessionscookie (`sid`). Utloggning tar bort sessionen. `GET /api/auth/me` returnerar inloggad användare eller `401` om ingen session finns.
-- Uppgifter (`/api/tasks`): Alla endpoints är skyddade bakom session. Uppgifterna sparas per användare i `Users/<id>.json` som en JSON-array. Skapa (`POST`) kräver minst `taskText`. Uppdatera (`PATCH /:id`) validerar fält: `priority` måste vara en av `Low|Medium|High`, `category` en av `Private|Work|School|No Category`, och `deadline` måste följa formatet `YYYY-MM-DDTHH:MM` eller vara `null`. Borttagning (`DELETE /:id`) tar bort uppgiften.
+**Backend-exponering:**
+
+- Autentisering (`/api/auth/*`): Registrering hashar lösenord med bcryptjs (cost 10) och sparar användare i Azure SQL. Inloggning verifierar hash och sätter en sessionscookie (`sid`). Utloggning tar bort sessionen. `GET /api/auth/me` returnerar inloggad användare eller `401` om ingen session finns.
+- Uppgifter (`/api/tasks`): Alla endpoints är skyddade bakom session. Uppgifterna sparas per användare i tabellen `tasks` i Azure SQL. Skapa (`POST`) kräver minst `taskText`. Uppdatera (`PATCH /:id`) validerar fält: `priority` måste vara en av `Low|Medium|High`, `category` en av `Private|Work|School|No Category`, och `deadline` måste följa formatet `YYYY-MM-DDTHH:MM` eller vara `null`. Borttagning (`DELETE /:id`) tar bort uppgiften.
 
 Frontenden (under `public/`) presenterar ett enkelt UI:
 
@@ -30,29 +46,41 @@ Frontenden (under `public/`) presenterar ett enkelt UI:
 ## Projektstruktur
 
 ```text
+
 Task-Track/
 ├─ nodemon.json
 ├─ package.json
 ├─ README.md
 ├─ server.js
-├─ users.json
+├─ Deploy.ps1
 ├─ public/
 │  ├─ 404.html
 │  ├─ about.html
 │  ├─ index.html
 │  ├─ index.js
 │  └─ styles.css
-└─ Users/
+
 ```
 
 ## English Summary
 
-Task Track is a `Node.js` and `Express` app with a static frontend. Users can register/login, then create, edit, delete and mark tasks as done. Each user’s tasks are stored in flat JSON files under Users/<id>.json, while the user registry lives in users.json.
+Task Track is a `Node.js` and `Express` app with a static frontend. Users can register/login, then create, edit, delete and mark tasks as done. All data is stored in Azure SQL Database. Secrets are managed via Azure Key Vault.
 
-Run it with:
+## Lokal utveckling
+
+För att köra projektet lokalt måste du skapa en `.env`-fil i projektroten med följande innehåll:
+
+```env
+SESSIONSECRET=din-super-hemliga-sträng
+SqlConnectionString=Server=tcp:task-track-server.database.windows.net,1433;Initial Catalog=Task-Track-DB;Persist Security Info=False;User ID=Task-Track-Admin;Password=DITT_LÖSENORD;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;
+```
+
+Byt ut värdena mot dina egna. Dessa variabler krävs för att backend ska starta lokalt.
+
+Run locally:
 
 ```bash
-cd Task-Track
+cd Task-Track-Azure
 npm install
 npm run dev
 ```
@@ -62,6 +90,18 @@ Or start without nodemon:
 ```bash
 npm start
 ```
+
+**Deploy to Azure Web App:**
+
+1. Se till att Azure-resurser är skapade: SQL Database, Key Vault (`kv-task-track`), och Web App.
+2. Lägg in hemligheterna `SESSIONSECRET` och `SqlConnectionString` i Key Vault.
+3. Kör deploymentscriptet:
+
+```powershell
+./Deploy.ps1
+```
+
+Scriptet packar och laddar upp koden till din Azure Web App.
 
 ## Huvudmeny
 
@@ -85,7 +125,7 @@ Status visas i UI:t: antal uppgifter totalt, antal klara, samt visualisering av 
 ## Funktioner
 
 - Autentisering: Registrering, inloggning, utloggning via sessionscookies
-- Per-användarlagring: Uppgifter sparas i Users/<id>.json
+- Per-användarlagring: Uppgifter sparas i Azure SQL Database
 - CRUD för uppgifter: Skapa, hämta, uppdatera (text, done, deadline, kategori, prioritet), ta bort
 - Deadlines: Varningar för ≤1 dag kvar, ≤1 timme kvar, och utgången deadline (Expired!)
 - Sortering och räkning: Antal totalt/klara; sortera efter ID/prioritet/kategori eller deadline
@@ -140,40 +180,14 @@ Uppgifter (kräver inloggning)
 - PATCH /api/tasks/:id – Uppdaterar uppgift (done, text, deadline, kategori, prioritet)
 - DELETE /api/tasks/:id – Raderar uppgift
 
-## Datafiler
+## Databasstruktur (Azure SQL)
 
-- users.json – Lista över registrerade användare (id, username, passwordHash, createdAt)
-- Users/<id>.json – Uppgifterna för respektive användar-ID
+Alla användare och uppgifter lagras i Azure SQL Database med två tabeller:
 
-### Exempel: users.json
+- **users**: id (PK), username (unik), passwordHash
+- **tasks**: id (PK), userId (FK), taskText, priority, deadline, category, done
 
-```json
-[
-  {
-    "id": 1,
-    "username": "alaa",
-    "passwordHash": "$2b$10$...",
-    "createdAt": "2026-02-10T12:00:00.000Z"
-  }
-]
-```
-
-### Exempel: Users/1.json
-
-```json
-[
-  {
-    "id": 1,
-    "taskText": "Buy milk",
-    "priority": "High",
-    "deadline": "2026-02-11T09:30",
-    "category": "Private",
-    "done": false
-  }
-]
-```
-
-Data lagras som en JSON-array per användare. Filen skapas automatiskt när användaren börjar lägga till uppgifter. Mapp `Users` skapas vid serverstart om den saknas.
+Tabellerna skapas automatiskt vid första körning om de inte finns.
 
 ## Utvecklare
 
@@ -183,4 +197,7 @@ Alaa Alsous
 
 - Språk: JavaScript
 - Plattform: Node.js / Express; Frontend: HTML/CSS/JS
+- Databas: Azure SQL Database
+- Hemligheter: Azure Key Vault
+- Deployment: Azure Web App, PowerShell (Deploy.ps1)
 - Verktyg: VS Code, Nodemon
