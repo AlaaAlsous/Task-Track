@@ -1,17 +1,18 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="sv">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Page Not Found - Task Track</title>
-    <link rel="icon" type="image/png" href="/favicon.png" />
+    <link rel="icon" type="image/png" href="/Assets/favicon.png" />
     <link rel="stylesheet" href="/styles.css" />
+    <script src="/index.js" defer></script>
   </head>
   <body>
     <header>
       <h1 class="notfound-h1">404 Not Found</h1>
       <img
-        src="/logo.png"
+        src="/Assets/logo.png"
         alt="Task Track Logo"
         class="logo-img"
         style="max-width: 175px"
@@ -25,14 +26,20 @@
         <h1>404</h1>
         <h3>Oops! This page not found...</h3>
         <img
-          src="/404.png"
-          alt="Donald Duck 404"
+          src="/Assets/logo.png"
+          alt="Not Found 404"
           class="notfound-img"
           style="max-width: 200px"
         />
         <p>Please check the URL or Click "Home" to get back on track!.</p>
       </section>
     </main>
-    <footer><p>© 2025 Task Track - MAAS</p></footer>
+    <footer>
+      <p>© <span id="footeryear"></span> Task Track</p>
+    </footer>
+    <script>
+      document.getElementById("footeryear").textContent =
+        new Date().getFullYear();
+    </script>
   </body>
 </html>
