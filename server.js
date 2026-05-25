@@ -1,125 +1,129 @@
-"use strict";
-
 import express from "express";
-import fs from "fs";
 import session from "express-session";
-import bcrypt from "bcrypt";
-import path from "node:path";
-const app = express();
-const port = process.env.PORT ? Number(process.env.PORT) : 3000;
+import bcryptjs from "bcryptjs";
+import sql from "mssql";
+import dotenv from "dotenv";
+dotenv.config();
 
-app.set("trust proxy", 1);
+let sessionSecret = process.env.SESSIONSECRET;
+let sqlConnectionString = process.env.SqlConnectionString;
 
-app.use(express.static("public"));
-app.use(express.json());
+let db;
 
-const isProd = process.env.NODE_ENV === "production";
-app.use(
-  session({
-    name: "sid",
-    secret: process.env.SESSION_SECRET || "dev-secret-change-me",
-    resave: false,
-    saveUninitialized: false,
-    cookie: {
-      httpOnly: true,
-      secure: isProd,
-      sameSite: isProd ? "none" : "lax",
-      maxAge: 1000 * 60 * 60 * 24 * 7,
-    },
-  }),
-);
+async function loadSecretsAndStart() {
+  if (sessionSecret && sqlConnectionString) {
+    console.log("Running locally with .env secrets");
+    await connectToSql();
+    startServer();
+    return;
+  }
 
-const TASKS_DIR = "Users";
-if (!fs.existsSync(TASKS_DIR)) {
-  fs.mkdirSync(TASKS_DIR, { recursive: true });
+  console.log("Loading secrets from Azure Key Vault...");
+  const keyVaultName = "kv-task-track";
+
+  const { DefaultAzureCredential } = await import("@azure/identity");
+  const { SecretClient } = await import("@azure/keyvault-secrets");
+
+  const credential = new DefaultAzureCredential();
+  const client = new SecretClient(
+    `https://${keyVaultName}.vault.azure.net`,
+    credential,
+  );
+
+  const sessionSecretObj = await client.getSecret("SESSIONSECRET");
+  const sqlSecretObj = await client.getSecret("SqlConnectionString");
+
+  if (!sessionSecretObj.value || !sqlSecretObj.value) {
+    throw new Error("Missing required secrets in Key Vault");
+  }
+
+  sessionSecret = sessionSecretObj.value;
+  sqlConnectionString = sqlSecretObj.value;
+
+  await connectToSql();
+  startServer();
 }
 
-let users = [];
+async function connectToSql() {
+  try {
+    db = await sql.connect(sqlConnectionString);
+    console.log("Connected to Azure SQL!");
 
-const USERS_FILE = "users.json";
-if (!fs.existsSync(USERS_FILE)) {
-  fs.writeFileSync(USERS_FILE, "[]");
+    await db.request().query(`
+      IF NOT EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = 'users')
+      CREATE TABLE users (
+        id INT IDENTITY(1,1) PRIMARY KEY,
+        username NVARCHAR(50) NOT NULL UNIQUE,
+        passwordHash NVARCHAR(255) NOT NULL
+      );
+
+      IF NOT EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = 'tasks')
+      CREATE TABLE tasks (
+        id INT IDENTITY(1,1) PRIMARY KEY,
+        userId INT NOT NULL,
+        taskText NVARCHAR(100) NOT NULL,
+        priority NVARCHAR(10) NOT NULL,
+        deadline DATETIME NULL,
+        category NVARCHAR(20) NOT NULL,
+        done BIT NOT NULL,
+        FOREIGN KEY (userId) REFERENCES users(id) ON DELETE CASCADE
+      );
+    `);
+  } catch (err) {
+    console.error("SQL connection failed:", err);
+    throw new Error("Could not connect to SQL: " + err.message);
+  }
 }
-loadUsers();
 
-app.get("/index.html", (req, res) => {
-  res.redirect("/");
-});
+function startServer() {
+  console.log("Starting server...");
 
-app.post("/api/auth/register", async (req, res) => {
-  try {
-    const { username, password } = req.body;
-    if (!username || !password) {
-      return res
-        .status(400)
-        .json({ error: "Username and password are required." });
-    }
-    const existing = users.find(
-      (u) => u.username.toLowerCase() === String(username).toLowerCase(),
-    );
-    if (existing) {
-      return res.status(409).json({ error: "User already exists." });
-    }
-    const passwordHash = await bcrypt.hash(String(password), 10);
-    const newUser = {
-      id: users.length > 0 ? Math.max(...users.map((u) => u.id)) + 1 : 1,
-      username: String(username),
-      passwordHash,
-      createdAt: new Date().toISOString(),
-    };
-    users.push(newUser);
-    await saveUsers();
+  const app = express();
+  const port = process.env.PORT || 3000;
 
-    req.session.userId = newUser.id;
-    res.status(201).json({ id: newUser.id, username: newUser.username });
-  } catch (err) {
-    res.status(500).json({ error: "Internal server error." });
-  }
-});
+  app.use(express.static("public"));
+  app.use(express.json());
+  app.set("trust proxy", 1);
 
-app.post("/api/auth/login", async (req, res) => {
-  try {
-    const { username, password } = req.body;
-    if (!username || !password) {
-      return res
-        .status(400)
-        .json({ error: "Username and password are required." });
-    }
-    const user = users.find(
-      (u) => u.username.toLowerCase() === String(username).toLowerCase(),
-    );
-    if (!user) {
-      return res
-        .status(401)
-        .json({ error: "Username or password is incorrect." });
-    }
-    const valid = await bcrypt.compare(String(password), user.passwordHash);
-    if (!valid) {
-      return res
-        .status(401)
-        .json({ error: "Username or password is incorrect." });
-    }
-    req.session.userId = user.id;
-    res.json({ id: user.id, username: user.username });
-  } catch (err) {
-    res.status(500).json({ error: "Internal server error." });
-  }
-});
+  const isProd = process.env.NODE_ENV === "production";
 
-app.post("/api/auth/logout", (req, res) => {
-  req.session.destroy((err) => {
-    if (err) return res.status(500).json({ error: "Could not logout." });
-    res.clearCookie("sid");
-    res.status(204).end();
+  app.use(
+    session({
+      name: "sid",
+      secret: sessionSecret,
+      resave: false,
+      saveUninitialized: false,
+      cookie: {
+        httpOnly: true,
+        secure: isProd,
+        sameSite: isProd ? "none" : "lax",
+        maxAge: 1000 * 60 * 60 * 24 * 7,
+      },
+    }),
+  );
+
+  app.get("/", (req, res) => {
+    res.sendFile("index.html", { root: "public" });
   });
-});
 
-app.get("/api/auth/me", (req, res) => {
-  const user = users.find((u) => u.id === req.session.userId);
-  if (!user)
-    return res.status(401).json({ error: "The user is not logged in." });
-  res.json({ id: user.id, username: user.username });
-});
+  app.post("/api/auth/register", registerUser);
+  app.post("/api/auth/login", loginUser);
+  app.post("/api/auth/logout", logoutUser);
+  app.get("/api/auth/me", getCurrentUser);
+
+  app.get("/api/tasks", requireAuth, getTasks);
+  app.post("/api/tasks", requireAuth, createTask);
+  app.patch("/api/tasks/:id", requireAuth, updateTask);
+  app.delete("/api/tasks/:id", requireAuth, deleteTask);
+
+  app.use((req, res) => {
+    res.status(404).sendFile("404.html", { root: "public" });
+  });
+
+  app.listen(port, () => {
+    console.log(`Listening on port ${port}`);
+  });
+}
 
 function requireAuth(req, res, next) {
   if (!req.session.userId) {
@@ -128,23 +132,139 @@ function requireAuth(req, res, next) {
   next();
 }
 
-app.get("/api/tasks", requireAuth, async (req, res) => {
+async function registerUser(req, res) {
   try {
-    const tasks = await loadUserTasks(req.session.userId);
-    res.json(tasks);
+    const { username, password } = req.body;
+    if (!username || !password) {
+      return res
+        .status(400)
+        .json({ error: "Username and password are required." });
+    }
+
+    const existing = await db
+      .request()
+      .input("username", sql.NVarChar(50), username)
+      .query("SELECT id FROM users WHERE LOWER(username) = LOWER(@username)");
+
+    if (existing.recordset.length > 0) {
+      return res.status(409).json({ error: "User already exists." });
+    }
+
+    const passwordHash = await bcryptjs.hash(String(password), 10);
+
+    const insert = await db
+      .request()
+      .input("username", sql.NVarChar(50), username)
+      .input("passwordHash", sql.NVarChar(255), passwordHash)
+      .query(
+        "INSERT INTO users (username, passwordHash) OUTPUT INSERTED.id VALUES (@username, @passwordHash)",
+      );
+
+    const userId = insert.recordset[0].id;
+    req.session.userId = userId;
+
+    res.status(201).json({ id: userId, username });
+  } catch (err) {
+    res.status(500).json({ error: "Internal server error." });
+  }
+}
+
+async function loginUser(req, res) {
+  try {
+    const { username, password } = req.body;
+    if (!username || !password) {
+      return res
+        .status(400)
+        .json({ error: "Username and password are required." });
+    }
+
+    const result = await db
+      .request()
+      .input("username", sql.NVarChar(50), username)
+      .query(
+        "SELECT id, passwordHash FROM users WHERE LOWER(username) = LOWER(@username)",
+      );
+
+    if (result.recordset.length === 0) {
+      return res
+        .status(401)
+        .json({ error: "Username or password is incorrect." });
+    }
+
+    const user = result.recordset[0];
+    const valid = await bcryptjs.compare(String(password), user.passwordHash);
+
+    if (!valid) {
+      return res
+        .status(401)
+        .json({ error: "Username or password is incorrect." });
+    }
+
+    req.session.userId = user.id;
+    res.json({ id: user.id, username });
+  } catch (err) {
+    res.status(500).json({ error: "Internal server error." });
+  }
+}
+
+function logoutUser(req, res) {
+  req.session.destroy((err) => {
+    if (err) return res.status(500).json({ error: "Could not logout." });
+    res.clearCookie("sid");
+    res.status(204).end();
+  });
+}
+
+async function getCurrentUser(req, res) {
+  if (!req.session.userId) {
+    return res.status(401).json({ error: "The user is not logged in." });
+  }
+
+  try {
+    const result = await db
+      .request()
+      .input("id", sql.Int, req.session.userId)
+      .query("SELECT id, username FROM users WHERE id = @id");
+
+    if (result.recordset.length === 0) {
+      return res.status(401).json({ error: "The user is not logged in." });
+    }
+
+    const user = result.recordset[0];
+    res.json({ id: user.id, username: user.username });
+  } catch (err) {
+    res.status(500).json({ error: "Internal server error." });
+  }
+}
+
+async function getTasks(req, res) {
+  try {
+    const result = await db
+      .request()
+      .input("userId", sql.Int, req.session.userId).query(`
+        SELECT *,
+          ROW_NUMBER() OVER (ORDER BY id) AS userTaskNumber
+        FROM tasks
+        WHERE userId = @userId
+        ORDER BY id
+      `);
+
+    res.json(result.recordset);
   } catch {
     res
       .status(500)
       .json({ error: "Internal server error. Please try again later." });
   }
-});
+}
 
-app.post("/api/tasks", requireAuth, async (req, res) => {
+async function createTask(req, res) {
   try {
     const { taskText, deadline, priority, category } = req.body;
+
     if (!taskText || !String(taskText).trim()) {
       return res.status(400).json({ error: "Task text is required." });
     }
+
     const allowedPriorities = new Set(["Low", "Medium", "High"]);
     const allowedCategories = new Set([
       "Private",
@@ -152,156 +272,168 @@ app.post("/api/tasks", requireAuth, async (req, res) => {
       "School",
       "No Category",
     ]);
-    const tasks = await loadUserTasks(req.session.userId);
-    const nextId =
-      tasks.length > 0 ? Math.max(...tasks.map((t) => t.id)) + 1 : 1;
-    const newTask = {
-      id: nextId,
-      taskText: String(taskText).trim(),
-      priority: allowedPriorities.has(priority) ? priority : "Low",
-      deadline: deadline || null,
-      category: allowedCategories.has(category) ? category : "No Category",
-      done: false,
-    };
-    tasks.push(newTask);
-    await saveUserTasks(req.session.userId, tasks);
-    res.status(201).json(newTask);
+
+    const priorityVal = allowedPriorities.has(priority) ? priority : "Low";
+    const categoryVal = allowedCategories.has(category)
+      ? category
+      : "No Category";
+
+    const insertResult = await db
+      .request()
+      .input("userId", sql.Int, req.session.userId)
+      .input("taskText", sql.NVarChar(100), String(taskText).trim())
+      .input("priority", sql.NVarChar(10), priorityVal)
+      .input("deadline", sql.DateTime, deadline || null)
+      .input("category", sql.NVarChar(20), categoryVal)
+      .input("done", sql.Bit, false)
+      .query(
+        `INSERT INTO tasks (userId, taskText, priority, deadline, category, done)
+         OUTPUT INSERTED.*
+         VALUES (@userId, @taskText, @priority, @deadline, @category, @done)`,
+      );
+
+    res.status(201).json(insertResult.recordset[0]);
   } catch {
     res
       .status(500)
       .json({ error: "Internal server error. Please try again later." });
   }
-});
+}
 
-app.patch("/api/tasks/:id", requireAuth, async (req, res) => {
+async function updateTask(req, res) {
   try {
     const taskId = Number(req.params.id);
     const { done, taskText, priority, deadline, category } = req.body;
-    const tasks = await loadUserTasks(req.session.userId);
-    for (let i = 0; i < tasks.length; i++) {
-      if (tasks[i].id === taskId) {
-        if (typeof done === "boolean") {
-          tasks[i].done = done;
+
+    const result = await db
+      .request()
+      .input("id", sql.Int, taskId)
+      .input("userId", sql.Int, req.session.userId)
+      .query("SELECT * FROM tasks WHERE id = @id AND userId = @userId");
+
+    if (result.recordset.length === 0) {
+      return res.status(404).json({ error: "Task not found." });
+    }
+
+    const task = result.recordset[0];
+
+    const updates = [];
+    const params = { id: taskId, userId: req.session.userId };
+
+    if (typeof done === "boolean") {
+      updates.push("done = @done");
+      params.done = done;
+    }
+
+    if (typeof taskText === "string") {
+      const trimmed = taskText.trim();
+      if (!trimmed) {
+        return res.status(400).json({ error: "Task text is required." });
+      }
+      updates.push("taskText = @taskText");
+      params.taskText = trimmed;
+    }
+
+    if (typeof priority === "string") {
+      const allowedPriorities = new Set(["Low", "Medium", "High"]);
+      if (!allowedPriorities.has(priority)) {
+        return res.status(400).json({ error: "Invalid priority value." });
+      }
+      updates.push("priority = @priority");
+      params.priority = priority;
+    }
+
+    if (category !== undefined) {
+      if (category === null) {
+        updates.push("category = @category");
+        params.category = "No Category";
+      } else if (typeof category === "string") {
+        const allowedCategories = new Set([
+          "Private",
+          "Work",
+          "School",
+          "No Category",
+        ]);
+        if (!allowedCategories.has(category)) {
+          return res.status(400).json({ error: "Invalid category value." });
         }
-        if (typeof taskText === "string") {
-          const trimmed = taskText.trim();
-          if (!trimmed) {
-            return res.status(400).json({ error: "Task text is required." });
-          }
-          tasks[i].taskText = trimmed;
-        }
-        if (typeof priority === "string") {
-          const allowedPriorities = new Set(["Low", "Medium", "High"]);
-          if (!allowedPriorities.has(priority)) {
-            return res.status(400).json({ error: "Invalid priority value." });
-          }
-          tasks[i].priority = priority;
-        }
-        if (category !== undefined) {
-          if (category === null) {
-            tasks[i].category = "No Category";
-          } else if (typeof category === "string") {
-            const allowedCategories = new Set([
-              "Private",
-              "Work",
-              "School",
-              "No Category",
-            ]);
-            if (!allowedCategories.has(category)) {
-              return res.status(400).json({ error: "Invalid category value." });
-            }
-            tasks[i].category = category;
-          }
-        }
-        if (deadline !== undefined) {
-          if (deadline === null || deadline === "") {
-            tasks[i].deadline = null;
-          } else if (typeof deadline === "string") {
-            const valid = /\d{4}-\d{2}-\d{2}T\d{2}:\d{2}/.test(deadline);
-            if (!valid) {
-              return res
-                .status(400)
-                .json({ error: "Invalid deadline format." });
-            }
-            tasks[i].deadline = deadline;
-          }
-        }
-        await saveUserTasks(req.session.userId, tasks);
-        return res.json(tasks[i]);
+        updates.push("category = @category");
+        params.category = category;
       }
     }
-    res.status(404).json({ error: "Task not found." });
+
+    if (deadline !== undefined) {
+      if (deadline === null || deadline === "") {
+        updates.push("deadline = @deadline");
+        params.deadline = null;
+      } else if (typeof deadline === "string") {
+        updates.push("deadline = @deadline");
+        params.deadline = deadline;
+      }
+    }
+
+    if (updates.length === 0) {
+      return res.json(task);
+    }
+
+    let reqSql = db
+      .request()
+      .input("id", sql.Int, params.id)
+      .input("userId", sql.Int, params.userId);
+
+    if ("done" in params) {
+      reqSql = reqSql.input("done", sql.Bit, params.done);
+    }
+    if ("taskText" in params) {
+      reqSql = reqSql.input("taskText", sql.NVarChar(100), params.taskText);
+    }
+    if ("priority" in params) {
+      reqSql = reqSql.input("priority", sql.NVarChar(10), params.priority);
+    }
+    if ("category" in params) {
+      reqSql = reqSql.input("category", sql.NVarChar(20), params.category);
+    }
+    if ("deadline" in params) {
+      reqSql = reqSql.input("deadline", sql.DateTime, params.deadline);
+    }
+
+    await reqSql.query(
+      `UPDATE tasks SET ${updates.join(", ")} WHERE id = @id AND userId = @userId`,
+    );
+
+    const updated = await db
+      .request()
+      .input("id", sql.Int, taskId)
+      .query("SELECT * FROM tasks WHERE id = @id");
+
+    res.json(updated.recordset[0]);
   } catch {
     res
       .status(500)
       .json({ error: "Internal server error. Please try again later." });
   }
-});
+}
 
-app.delete("/api/tasks/:id", requireAuth, async (req, res) => {
+async function deleteTask(req, res) {
   try {
     const taskId = Number(req.params.id);
-    const tasks = await loadUserTasks(req.session.userId);
-    for (let i = 0; i < tasks.length; i++) {
-      if (tasks[i].id === taskId) {
-        tasks.splice(i, 1);
-        await saveUserTasks(req.session.userId, tasks);
-        return res.status(204).end();
-      }
+
+    const result = await db
+      .request()
+      .input("id", sql.Int, taskId)
+      .input("userId", sql.Int, req.session.userId)
+      .query("DELETE FROM tasks WHERE id = @id AND userId = @userId");
+
+    if (result.rowsAffected[0] === 0) {
+      return res.status(404).json({ error: "Task not found" });
     }
-    res.status(404).json({ error: "Task not found" });
+
+    res.status(204).end();
   } catch {
     res
       .status(500)
       .json({ error: "Internal server error. Please try again later." });
   }
-});
-
-function getUserTasksPath(userId) {
-  return path.join(TASKS_DIR, `${userId}.json`);
 }
 
-async function loadUserTasks(userId) {
-  try {
-    const p = getUserTasksPath(userId);
-    const data = await fs.promises.readFile(p, "utf8");
-    return JSON.parse(data);
-  } catch {
-    return [];
-  }
-}
-
-async function saveUserTasks(userId, tasks) {
-  try {
-    const p = getUserTasksPath(userId);
-    await fs.promises.writeFile(p, JSON.stringify(tasks));
-  } catch (error) {
-    throw error;
-  }
-}
-
-async function loadUsers() {
-  try {
-    const data = await fs.promises.readFile(USERS_FILE, "utf8");
-    const trimmed = data.trim();
-    users = trimmed ? JSON.parse(trimmed) : [];
-  } catch {
-    users = [];
-  }
-}
-
-async function saveUsers() {
-  try {
-    await fs.promises.writeFile(USERS_FILE, JSON.stringify(users));
-  } catch (error) {
-    throw error;
-  }
-}
-
-app.use((req, res) => {
-  res.status(404).sendFile("404.html", { root: "public" });
-});
-
-app.listen(port, () => {
-  console.log(`http://localhost:${port}`);
-});
+loadSecretsAndStart();
