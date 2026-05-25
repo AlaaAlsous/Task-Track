@@ -415,21 +415,25 @@ async function doLoginModal() {
     const password = document
       .getElementById("modal-login-password")
       .value.trim();
+    const remember = document.getElementById("remember-me").checked;
     if (!username || !password) {
       loginErrorModal.textContent = "Please enter your username and password.";
       return;
     }
+
     const res = await fetch("/api/auth/login", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       credentials: "include",
-      body: JSON.stringify({ username, password }),
+      body: JSON.stringify({ username, password, remember }),
     });
+
     if (!res.ok) {
       const data = await res.json().catch(() => ({ error: "Login failed" }));
       loginErrorModal.textContent = data.error || "Login failed";
       return;
     }
+
     closeAuthModal();
     await checkAuthAndUpdateNav();
     loadTasks();

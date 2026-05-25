@@ -644,6 +644,34 @@ main {
 .remove-task {
   animation: fade-out 0.5s ease-in-out forwards;
 }
+
+.modal-body label.remember-container {
+  display: inline-flex !important;
+  flex-direction: row;
+  align-items: center;
+  gap: 0.4rem;
+  margin-top: 0.5rem;
+  margin-bottom: 0;
+  padding: 0;
+  background: none;
+  border: none;
+  box-shadow: none;
+  cursor: pointer;
+  user-select: none;
+}
+
+.modal-body label.remember-container input[type="checkbox"] {
+  transform: scale(1.2);
+  accent-color: #d4a574;
+  cursor: pointer;
+}
+
+.modal-body label.remember-container span {
+  font-size: clamp(0.8rem, 2vw, 1rem);
+  line-height: 1;
+  white-space: nowrap;
+}
+
 @keyframes fade-out {
   to {
     opacity: 0;
@@ -862,6 +890,14 @@ main {
   }
   .modal-body p {
     color: wheat;
+  }
+
+  .modal-body label.remember-container {
+    color: #2d2820;
+  }
+
+  .modal-body label.remember-container input[type="checkbox"] {
+    accent-color: #8c7d68;
   }
 }
 
