@@ -3,6 +3,9 @@ import session from "express-session";
 import bcryptjs from "bcryptjs";
 import sql from "mssql";
 import dotenv from "dotenv";
+import cookieParser from "cookie-parser";
+import crypto from "crypto";
+
 dotenv.config();
 
 let sessionSecret = process.env.SESSIONSECRET;
@@ -68,6 +71,15 @@ async function connectToSql() {
         done BIT NOT NULL,
         FOREIGN KEY (userId) REFERENCES users(id) ON DELETE CASCADE
       );
+
+      IF NOT EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = 'remember_tokens')
+      CREATE TABLE remember_tokens (
+        id INT IDENTITY(1,1) PRIMARY KEY,
+        userId INT NOT NULL,
+        token NVARCHAR(255) NOT NULL,
+        expiresAt DATETIME NOT NULL,
+        FOREIGN KEY (userId) REFERENCES users(id) ON DELETE CASCADE
+      );
     `);
   } catch (err) {
     console.error("SQL connection failed:", err);
@@ -80,12 +92,12 @@ function startServer() {
 
   const app = express();
   const port = process.env.PORT || 3000;
+  const isProd = process.env.NODE_ENV === "production";
 
   app.use(express.static("public"));
   app.use(express.json());
+  app.use(cookieParser());
   app.set("trust proxy", 1);
-
-  const isProd = process.env.NODE_ENV === "production";
 
   app.use(
     session({
@@ -101,6 +113,32 @@ function startServer() {
       },
     }),
   );
+
+  app.use(async (req, res, next) => {
+    try {
+      if (req.session.userId) return next();
+
+      const token = req.cookies?.rememberMe;
+      if (!token) return next();
+
+      const result = await db
+        .request()
+        .input("token", sql.NVarChar(255), token)
+        .query(
+          "SELECT userId, expiresAt FROM remember_tokens WHERE token = @token",
+        );
+
+      if (result.recordset.length === 0) return next();
+
+      const row = result.recordset[0];
+      if (new Date(row.expiresAt) < new Date()) return next();
+
+      req.session.userId = row.userId;
+      next();
+    } catch {
+      next();
+    }
+  });
 
   app.get("/", (req, res) => {
     res.sendFile("index.html", { root: "public" });
@@ -164,14 +202,14 @@ async function registerUser(req, res) {
     req.session.userId = userId;
 
     res.status(201).json({ id: userId, username });
-  } catch (err) {
+  } catch {
     res.status(500).json({ error: "Internal server error." });
   }
 }
 
 async function loginUser(req, res) {
   try {
-    const { username, password } = req.body;
+    const { username, password, remember } = req.body;
     if (!username || !password) {
       return res
         .status(400)
@@ -201,18 +239,55 @@ async function loginUser(req, res) {
     }
 
     req.session.userId = user.id;
+
+    if (remember) {
+      const token = crypto.randomBytes(32).toString("hex");
+      const expires = new Date(Date.now() + 1000 * 60 * 60 * 24 * 180);
+      const isProd = process.env.NODE_ENV === "production";
+
+      await db
+        .request()
+        .input("userId", sql.Int, user.id)
+        .input("token", sql.NVarChar(255), token)
+        .input("expiresAt", sql.DateTime, expires)
+        .query(
+          "INSERT INTO remember_tokens (userId, token, expiresAt) VALUES (@userId, @token, @expiresAt)",
+        );
+
+      res.cookie("rememberMe", token, {
+        httpOnly: true,
+        secure: isProd,
+        sameSite: isProd ? "none" : "lax",
+        maxAge: 1000 * 60 * 60 * 24 * 180,
+      });
+    }
+
     res.json({ id: user.id, username });
-  } catch (err) {
+  } catch {
     res.status(500).json({ error: "Internal server error." });
   }
 }
 
-function logoutUser(req, res) {
-  req.session.destroy((err) => {
-    if (err) return res.status(500).json({ error: "Could not logout." });
-    res.clearCookie("sid");
-    res.status(204).end();
-  });
+async function logoutUser(req, res) {
+  try {
+    const token = req.cookies?.rememberMe;
+    if (token) {
+      await db
+        .request()
+        .input("token", sql.NVarChar(255), token)
+        .query("DELETE FROM remember_tokens WHERE token = @token");
+    }
+
+    res.clearCookie("rememberMe");
+
+    req.session.destroy((err) => {
+      if (err) return res.status(500).json({ error: "Could not logout." });
+      res.clearCookie("sid");
+      res.status(204).end();
+    });
+  } catch {
+    res.status(500).json({ error: "Could not logout." });
+  }
 }
 
 async function getCurrentUser(req, res) {
@@ -232,7 +307,7 @@ async function getCurrentUser(req, res) {
 
     const user = result.recordset[0];
     res.json({ id: user.id, username: user.username });
-  } catch (err) {
+  } catch {
     res.status(500).json({ error: "Internal server error." });
   }
 }
