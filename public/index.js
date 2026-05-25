@@ -1,4 +1,5 @@
 "use strict";
+
 const authLink = document.getElementById("auth-link");
 const authModal = document.getElementById("auth-modal");
 const modalClose = document.getElementById("modal-close");
@@ -23,9 +24,11 @@ function openAuthModal(mode = "login") {
   }
   authModal.style.display = "flex";
 }
+
 function closeAuthModal() {
   authModal.style.display = "none";
 }
+
 modalClose.onclick = closeAuthModal;
 switchToRegister.onclick = () => openAuthModal("register");
 switchToLogin.onclick = () => openAuthModal("login");
@@ -39,6 +42,7 @@ async function checkAuthAndUpdateNav() {
     const res = await fetch("/api/auth/me", { credentials: "include" });
     if (!res.ok) throw new Error("Not authed");
     const me = await res.json();
+
     authLink.textContent = `Sign Out (${me.username})`;
     authLink.onclick = async (e) => {
       e.preventDefault();
@@ -69,6 +73,42 @@ const sortByIdCheckbox = document.getElementById("sortById");
 const sortByPriorityCheckbox = document.getElementById("sortByPriority");
 const sortByCategoryCheckbox = document.getElementById("sortByCategory");
 
+let editingTask = null;
+
+function formatDeadline(deadline) {
+  if (!deadline || deadline === "No Deadline") return "No Deadline";
+  const d = new Date(deadline);
+  if (isNaN(d.getTime())) return "No Deadline";
+
+  const pad = (n) => String(n).padStart(2, "0");
+  return (
+    `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} | ` +
+    `${pad(d.getHours())}:${pad(d.getMinutes())}`
+  );
+}
+
+function computeDeadlineFlags(task) {
+  let oneDayLeft = false;
+  let oneHourLeft = false;
+  let timeIsUp = false;
+
+  if (task.deadline && task.deadline !== "No Deadline") {
+    const deadlineDate = new Date(task.deadline);
+    const now = new Date();
+    const diffTime = deadlineDate.getTime() - now.getTime();
+    const diffDays = diffTime / (1000 * 60 * 60 * 24);
+    const diffHours = diffTime / (1000 * 60 * 60);
+
+    if (!task.done) {
+      if (diffDays <= 1 && diffDays > 0) oneDayLeft = true;
+      if (diffHours <= 1 && diffHours > 0) oneHourLeft = true;
+    }
+    if (now.getTime() > deadlineDate.getTime()) timeIsUp = true;
+  }
+
+  return { oneDayLeft, oneHourLeft, timeIsUp };
+}
+
 async function loadTasks() {
   try {
     const response = await fetch("/api/tasks", { credentials: "include" });
@@ -77,13 +117,17 @@ async function loadTasks() {
       return;
     }
     if (!response.ok) throw new Error("Failed to load tasks");
+
     let tasks = await response.json();
+
     document.getElementById("total-tasks").innerText = tasks.length;
     document.getElementById("completed-tasks").innerText = tasks.filter(
       (t) => t.done,
     ).length;
+
     tasks = tasks.sort((a, b) => {
       if (a.done !== b.done) return a.done - b.done;
+
       if (sortByIdCheckbox.checked) {
         return a.id - b.id;
       } else if (sortByPriorityCheckbox.checked) {
@@ -111,65 +155,66 @@ async function loadTasks() {
     });
 
     taskList.innerHTML = "";
+
     for (const task of tasks) {
       const listItem = document.createElement("li");
 
-      let oneDayLeft = false;
-      if (task.deadline && task.deadline !== "No Deadline" && !task.done) {
-        const deadlineDate = new Date(task.deadline);
-        const now = new Date();
-        const diffTime = deadlineDate.getTime() - now.getTime();
-        const diffDays = diffTime / (1000 * 60 * 60 * 24);
-        if (diffDays <= 1 && diffDays > 0) {
-          oneDayLeft = true;
-        }
-      }
+      const { oneDayLeft, oneHourLeft, timeIsUp } = computeDeadlineFlags(task);
 
-      let oneHourLeft = false;
-      if (task.deadline && task.deadline !== "No Deadline" && !task.done) {
-        const deadlineDate = new Date(task.deadline);
-        const now = new Date();
-        const diffTime = deadlineDate.getTime() - now.getTime();
-        const diffHours = diffTime / (1000 * 60 * 60);
-        if (diffHours <= 1 && diffHours > 0) {
-          oneHourLeft = true;
-        }
-      }
+      if (oneDayLeft) listItem.classList.add("one-day-left");
+      if (oneHourLeft) listItem.classList.add("one-hour-left");
+      if (timeIsUp) listItem.classList.add("time-is-up");
 
-      let timeIsUp = false;
-      if (task.deadline && task.deadline !== "No Deadline") {
-        const deadlineDate = new Date(task.deadline);
-        const now = new Date();
-        if (now.getTime() > deadlineDate.getTime()) {
-          timeIsUp = true;
-        }
-      }
+      const doneCheckbox = document.createElement("input");
+      doneCheckbox.type = "checkbox";
+      doneCheckbox.className = "done-checkbox";
+      doneCheckbox.style.accentColor = "#d4a574";
+      doneCheckbox.checked = !!task.done;
 
-      let formattedDeadline = task.deadline
-        ? task.deadline.replace("T", " | ")
-        : "No Deadline";
+      const idDiv = document.createElement("div");
+      idDiv.className = "task-id";
+      idDiv.textContent = task.userTaskNumber ?? task.id;
 
-      listItem.innerHTML = `<input type="checkbox" class="done-checkbox" style="accent-color: #d4a574;" ${
-        task.done ? "checked" : ""
-      }/> <div class="task-id">${task.id}</div><div class="task-text">${
-        task.taskText +
-        (timeIsUp ? "<span style = color:#750000> Expired!</span>" : "")
-      }</div> <div class="task-deadline">${formattedDeadline}</div>  <div class="task-category">${
-        task.category
-      }</div><div class="task-priority">${task.priority}</div>
-      <button class="editBtn">Edit</button><button class="deleteBtn">X</button>`;
+      const textDiv = document.createElement("div");
+      textDiv.className = "task-text";
+      textDiv.textContent = task.taskText;
 
-      if (oneDayLeft) {
-        listItem.classList.add("one-day-left");
-      }
-      if (oneHourLeft) {
-        listItem.classList.add("one-hour-left");
-      }
       if (timeIsUp) {
-        listItem.classList.add("time-is-up");
+        const expiredSpan = document.createElement("span");
+        expiredSpan.style.color = "#750000";
+        expiredSpan.textContent = " Expired!";
+        textDiv.appendChild(expiredSpan);
       }
 
-      const doneCheckbox = listItem.querySelector(".done-checkbox");
+      const deadlineDiv = document.createElement("div");
+      deadlineDiv.className = "task-deadline";
+      deadlineDiv.textContent = formatDeadline(task.deadline);
+
+      const categoryDiv = document.createElement("div");
+      categoryDiv.className = "task-category";
+      categoryDiv.textContent = task.category;
+
+      const priorityDiv = document.createElement("div");
+      priorityDiv.className = "task-priority";
+      priorityDiv.textContent = task.priority;
+
+      const editBtn = document.createElement("button");
+      editBtn.className = "editBtn";
+      editBtn.textContent = "Edit";
+
+      const deleteBtn = document.createElement("button");
+      deleteBtn.className = "deleteBtn";
+      deleteBtn.textContent = "X";
+
+      listItem.appendChild(doneCheckbox);
+      listItem.appendChild(idDiv);
+      listItem.appendChild(textDiv);
+      listItem.appendChild(deadlineDiv);
+      listItem.appendChild(categoryDiv);
+      listItem.appendChild(priorityDiv);
+      listItem.appendChild(editBtn);
+      listItem.appendChild(deleteBtn);
+
       doneCheckbox.onchange = async (e) => {
         try {
           const isDone = e.target.checked;
@@ -180,54 +225,98 @@ async function loadTasks() {
             body: JSON.stringify({ done: isDone }),
           });
           if (!response.ok) throw new Error("Failed to update task");
+
           if (isDone) {
             listItem.classList.add("done-task");
             setTimeout(() => {
               showNotification("✅ Task Completed!");
               loadTasks();
             }, 500);
-          } else if (!isDone) {
+          } else {
             listItem.classList.add("undone-task");
             setTimeout(() => {
               showNotification("❌ Task Unchecked!");
               loadTasks();
             }, 500);
           }
-        } catch (error) {
+        } catch {
           alert("Could not update task. Please try again.");
           e.target.checked = !e.target.checked;
         }
       };
 
-      const deleteBtn = listItem.querySelector(".deleteBtn");
-      deleteBtn.onclick = async () => {
-        try {
-          const response = await fetch(`/api/tasks/${task.id}`, {
-            method: "DELETE",
-            credentials: "include",
-          });
-          if (!response.ok) throw new Error("Failed to delete task");
-          listItem.classList.add("remove-task");
-          setTimeout(() => {
-            listItem.remove();
-            showNotification("❌ Task Deleted!");
-            loadTasks();
-          }, 500);
-        } catch (error) {
-          alert("Could not delete task. Please try again.");
-        }
+      deleteBtn.onclick = () => {
+        const deleteModal = document.getElementById("delete-modal");
+        deleteModal.style.display = "flex";
+        const confirmBtn = document.getElementById("delete-confirm-btn");
+        const cancelBtn = document.getElementById("delete-cancel-btn");
+
+        confirmBtn.onclick = null;
+        cancelBtn.onclick = null;
+
+        const handleEnter = (e) => handleEnterConfirmBtn(e, confirmBtn);
+        deleteModal.addEventListener("keydown", handleEnter);
+
+        confirmBtn.onclick = async () => {
+          try {
+            const response = await fetch(`/api/tasks/${task.id}`, {
+              method: "DELETE",
+              credentials: "include",
+            });
+            if (!response.ok) throw new Error("Failed to delete task");
+            deleteModal.style.display = "none";
+            listItem.classList.add("remove-task");
+            setTimeout(() => {
+              listItem.remove();
+              showNotification("❌ Task Deleted!");
+              loadTasks();
+            }, 500);
+          } catch {
+            alert("Could not delete task. Please try again.");
+            deleteModal.style.display = "none";
+          }
+          deleteModal.removeEventListener("keydown", handleEnter);
+        };
+
+        cancelBtn.onclick = () => {
+          deleteModal.style.display = "none";
+          deleteModal.removeEventListener("keydown", handleEnter);
+        };
+
+        confirmBtn.focus();
       };
 
-      const editBtn = listItem.querySelector(".editBtn");
       editBtn.onclick = () => {
+        if (editingTask && editingTask !== listItem) {
+          showEditModal(
+            () => {
+              const saveBtn = editingTask.querySelector(".saveBtn");
+              if (saveBtn) saveBtn.click();
+            },
+            () => {
+              editingTask = null;
+              loadTasks();
+            },
+            () => {
+              if (editingTask) {
+                const input = editingTask.querySelector("#edit-text");
+                if (input) input.focus();
+              }
+            },
+          );
+          return;
+        }
+
+        editingTask = listItem;
         const deadlineValue = task.deadline ? task.deadline : "";
+
         listItem.innerHTML = `
-          <div class="task-id">${task.id}</div>
+          <div class="task-id">${task.userTaskNumber ?? task.id}</div>
           <input id="edit-text" type="text" maxlength="100" style="outline:none;" value="${task.taskText.replace(
             /"/g,
             "&quot;",
           )}" class="task-text" />
-          <input id="edit-deadline" type="datetime-local" value="${deadlineValue}" class="task-deadline" />
+          <input id="edit-deadline" type="datetime-local" value="${deadlineValue || ""}" class="task-deadline" />
           <select id="edit-category" class="task-category">
             <option value="Private" ${
               task.category === "Private" ? "selected" : ""
@@ -259,16 +348,28 @@ async function loadTasks() {
 
         const saveBtn = listItem.querySelector(".saveBtn");
         const cancelBtn = listItem.querySelector(".cancelBtn");
+        const editText = listItem.querySelector("#edit-text");
+        const editDeadline = listItem.querySelector("#edit-deadline");
+        const editCategory = listItem.querySelector("#edit-category");
+        const editPriority = listItem.querySelector("#edit-priority");
+
+        [editText, editDeadline, editCategory, editPriority].forEach((el) => {
+          el.addEventListener("keydown", (e) => {
+            if (e.key === "Enter") {
+              e.preventDefault();
+              saveBtn.click();
+            }
+          });
+        });
 
         saveBtn.onclick = async () => {
-          const newText = listItem.querySelector("#edit-text").value.trim();
-          const newDeadline = listItem.querySelector("#edit-deadline").value;
-          const newCategory = listItem.querySelector("#edit-category").value;
-          const newPriority = listItem.querySelector("#edit-priority").value;
+          const newText = editText.value.trim();
+          const newDeadline = editDeadline.value;
+          const newCategory = editCategory.value;
+          const newPriority = editPriority.value;
 
-          if (!newText) {
-            return;
-          }
+          if (!newText) return;
+
           try {
             const response = await fetch(`/api/tasks/${task.id}`, {
               method: "PATCH",
@@ -283,22 +384,26 @@ async function loadTasks() {
             });
             if (!response.ok) throw new Error("Failed to update task");
             showNotification("✏️ Task Updated!");
+            editingTask = null;
             loadTasks();
-          } catch (error) {
+          } catch {
             alert("Could not update task. Please try again.");
           }
         };
 
         cancelBtn.onclick = () => {
+          editingTask = null;
           loadTasks();
         };
       };
+
       taskList.appendChild(listItem);
     }
-  } catch (error) {
+  } catch {
     alert("Could not load tasks. Please try again.");
   }
 }
+
 loadTasks();
 
 async function doLoginModal() {
@@ -328,7 +433,7 @@ async function doLoginModal() {
     closeAuthModal();
     await checkAuthAndUpdateNav();
     loadTasks();
-  } catch (e) {
+  } catch {
     loginErrorModal.textContent = "Technical error. Please try again.";
   }
 }
@@ -359,13 +464,39 @@ async function doRegisterModal() {
     closeAuthModal();
     await checkAuthAndUpdateNav();
     loadTasks();
-  } catch (e) {
+  } catch {
     registerErrorModal.textContent = "Technical error. Please try again.";
   }
 }
 
 loginBtnModal.onclick = doLoginModal;
 registerBtnModal.onclick = doRegisterModal;
+
+const registerUsernameInput = document.getElementById("modal-reg-username");
+const registerPasswordInput = document.getElementById("modal-reg-password");
+if (registerUsernameInput && registerPasswordInput && registerBtnModal) {
+  [registerUsernameInput, registerPasswordInput].forEach((el) => {
+    el.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        registerBtnModal.click();
+      }
+    });
+  });
+}
+
+const loginUsernameInput = document.getElementById("modal-login-username");
+const loginPasswordInput = document.getElementById("modal-login-password");
+if (loginUsernameInput && loginPasswordInput && loginBtnModal) {
+  [loginUsernameInput, loginPasswordInput].forEach((el) => {
+    el.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        loginBtnModal.click();
+      }
+    });
+  });
+}
 
 checkAuthAndUpdateNav();
 
@@ -381,7 +512,9 @@ async function addTask() {
     const taskPriority = priorityInput.value;
     const taskDeadline = deadlineInput.value;
     const taskCategory = categoryInput.value;
+
     if (!taskText) return;
+
     const response = await fetch("/api/tasks", {
       method: "POST",
       headers: {
@@ -395,7 +528,9 @@ async function addTask() {
         category: taskCategory ? taskCategory : "No Category",
       }),
     });
+
     if (!response.ok) throw new Error("Failed to add task");
+
     taskTextInput.value = "";
     priorityInput.value = "";
     deadlineInput.value = "";
@@ -403,15 +538,44 @@ async function addTask() {
     loadTasks();
     showNotification("✅ Task Added!");
     taskTextInput.focus();
-  } catch (error) {
+  } catch {
     alert("Could not add task. Please try again.");
   }
 }
+
 addBtn.onclick = addTask;
 
 taskTextInput.addEventListener("keydown", (e) => {
-  if (e.key === "Enter") addBtn.click();
+  if (e.key === "Enter") {
+    e.preventDefault();
+    addBtn.click();
+  }
 });
+
+function showEditModal(onSave, onCancel, onContinue) {
+  const modal = document.getElementById("save-modal");
+  modal.style.display = "flex";
+  const saveBtn = document.getElementById("save-modal-save");
+  const cancelBtn = document.getElementById("save-modal-cancel");
+  const continueBtn = document.getElementById("save-modal-continue");
+
+  saveBtn.onclick = null;
+  cancelBtn.onclick = null;
+  continueBtn.onclick = null;
+
+  saveBtn.onclick = () => {
+    modal.style.display = "none";
+    onSave?.();
+  };
+  cancelBtn.onclick = () => {
+    modal.style.display = "none";
+    onCancel?.();
+  };
+  continueBtn.onclick = () => {
+    modal.style.display = "none";
+    onContinue?.();
+  };
+}
 
 sortByIdCheckbox.onchange = () => {
   if (sortByIdCheckbox.checked) {
@@ -444,4 +608,11 @@ function showNotification(message) {
   setTimeout(() => {
     notification.classList.add("hide-notification");
   }, 1500);
+}
+
+function handleEnterConfirmBtn(e, confirmBtn) {
+  if (e.key === "Enter") {
+    e.preventDefault();
+    confirmBtn.click();
+  }
 }
