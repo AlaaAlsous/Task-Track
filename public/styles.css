@@ -917,18 +917,21 @@ main {
     min-width: 10rem;
   }
   .deleteBtn {
-    order: 4;
+    order: 8;
   }
   .task-id {
     order: 2;
   }
   .task-priority {
-    order: 5;
+    order: 4;
   }
   .task-category {
-    order: 6;
+    order: 5;
   }
   .task-deadline {
+    order: 6;
+  }
+  .editBtn {
     order: 7;
   }
   .task-counts {
@@ -945,6 +948,10 @@ main {
   }
   .nav {
     gap: 3rem;
+  }
+  .total,
+  .completed-tasks {
+    width: 7rem;
   }
 }
 
