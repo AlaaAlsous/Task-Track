@@ -705,6 +705,35 @@ main {
   }
 }
 
+.loading-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+
+.loading-overlay.hidden {
+  display: none;
+}
+
+.loading-spinner {
+  width: 60px;
+  height: 60px;
+  border: 10px solid #b1a18e;
+  border-top-color: #d4a574;
+  border-radius: 50%;
+  animation: loadingspin 0.8s linear infinite;
+}
+
+@keyframes loadingspin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 @media (prefers-color-scheme: light) {
   body {
     background-color: #f5f3ef;

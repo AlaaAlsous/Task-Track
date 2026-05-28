@@ -12,6 +12,23 @@ const registerBtnModal = document.getElementById("modal-register-btn");
 const loginErrorModal = document.getElementById("modal-login-error");
 const registerErrorModal = document.getElementById("modal-register-error");
 
+async function apiFetch(url, options = {}) {
+  showSpinner();
+
+  try {
+    const res = await fetch(url, {
+      credentials: "include",
+      ...options,
+    });
+
+    hideSpinner();
+    return res;
+  } catch (err) {
+    hideSpinner();
+    throw err;
+  }
+}
+
 function openAuthModal(mode = "login") {
   if (mode === "login") {
     loginForm.style.display = "block";
@@ -39,7 +56,7 @@ authLink.onclick = (e) => {
 
 async function checkAuthAndUpdateNav() {
   try {
-    const res = await fetch("/api/auth/me", { credentials: "include" });
+    const res = await apiFetch("/api/auth/me");
     if (!res.ok) throw new Error("Not authed");
     const me = await res.json();
 
@@ -47,9 +64,8 @@ async function checkAuthAndUpdateNav() {
     authLink.onclick = async (e) => {
       e.preventDefault();
       try {
-        await fetch("/api/auth/logout", {
+        await apiFetch("/api/auth/logout", {
           method: "POST",
-          credentials: "include",
         });
       } catch {}
       authLink.textContent = "Sign In";
@@ -111,7 +127,7 @@ function computeDeadlineFlags(task) {
 
 async function loadTasks() {
   try {
-    const response = await fetch("/api/tasks", { credentials: "include" });
+    const response = await apiFetch("/api/tasks");
     if (response.status === 401) {
       openAuthModal("login");
       return;
@@ -218,10 +234,9 @@ async function loadTasks() {
       doneCheckbox.onchange = async (e) => {
         try {
           const isDone = e.target.checked;
-          const response = await fetch(`/api/tasks/${task.id}`, {
+          const response = await apiFetch(`/api/tasks/${task.id}`, {
             method: "PATCH",
             headers: { "Content-Type": "application/json" },
-            credentials: "include",
             body: JSON.stringify({ done: isDone }),
           });
           if (!response.ok) throw new Error("Failed to update task");
@@ -259,9 +274,8 @@ async function loadTasks() {
 
         confirmBtn.onclick = async () => {
           try {
-            const response = await fetch(`/api/tasks/${task.id}`, {
+            const response = await apiFetch(`/api/tasks/${task.id}`, {
               method: "DELETE",
-              credentials: "include",
             });
             if (!response.ok) throw new Error("Failed to delete task");
             deleteModal.style.display = "none";
@@ -371,10 +385,9 @@ async function loadTasks() {
           if (!newText) return;
 
           try {
-            const response = await fetch(`/api/tasks/${task.id}`, {
+            const response = await apiFetch(`/api/tasks/${task.id}`, {
               method: "PATCH",
               headers: { "Content-Type": "application/json" },
-              credentials: "include",
               body: JSON.stringify({
                 taskText: newText,
                 deadline: newDeadline ? newDeadline : null,
@@ -408,6 +421,7 @@ loadTasks();
 
 async function doLoginModal() {
   loginErrorModal.textContent = "";
+
   try {
     const username = document
       .getElementById("modal-login-username")
@@ -416,15 +430,15 @@ async function doLoginModal() {
       .getElementById("modal-login-password")
       .value.trim();
     const remember = document.getElementById("remember-me").checked;
+
     if (!username || !password) {
       loginErrorModal.textContent = "Please enter your username and password.";
       return;
     }
 
-    const res = await fetch("/api/auth/login", {
+    const res = await apiFetch("/api/auth/login", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      credentials: "include",
       body: JSON.stringify({ username, password, remember }),
     });
 
@@ -437,7 +451,7 @@ async function doLoginModal() {
     closeAuthModal();
     await checkAuthAndUpdateNav();
     loadTasks();
-  } catch {
+  } catch (err) {
     loginErrorModal.textContent = "Technical error. Please try again.";
   }
 }
@@ -452,10 +466,9 @@ async function doRegisterModal() {
         "Please enter your username and password.";
       return;
     }
-    const res = await fetch("/api/auth/register", {
+    const res = await apiFetch("/api/auth/register", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      credentials: "include",
       body: JSON.stringify({ username, password }),
     });
     if (!res.ok) {
@@ -519,12 +532,11 @@ async function addTask() {
 
     if (!taskText) return;
 
-    const response = await fetch("/api/tasks", {
+    const response = await apiFetch("/api/tasks", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      credentials: "include",
       body: JSON.stringify({
         taskText: taskText,
         priority: taskPriority ? taskPriority : "Low",
@@ -619,4 +631,14 @@ function handleEnterConfirmBtn(e, confirmBtn) {
     e.preventDefault();
     confirmBtn.click();
   }
+}
+
+function showSpinner() {
+  const overlay = document.getElementById("loading-overlay");
+  if (overlay) overlay.classList.remove("hidden");
+}
+
+function hideSpinner() {
+  const overlay = document.getElementById("loading-overlay");
+  if (overlay) overlay.classList.add("hidden");
 }
