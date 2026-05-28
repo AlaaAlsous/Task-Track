@@ -888,6 +888,11 @@ main {
   .notfound-content h3 {
     color: #4a3f33;
   }
+
+  .modal-body {
+    background-color: #b1a18e;
+  }
+
   .modal-body p {
     color: wheat;
   }
@@ -898,6 +903,10 @@ main {
 
   .modal-body label.remember-container input[type="checkbox"] {
     accent-color: #8c7d68;
+  }
+
+  .error {
+    color: #2d2820;
   }
 }
 
