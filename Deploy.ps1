@@ -9,7 +9,7 @@ Write-Host "🧹 Cleaning old ZIP..."
 Remove-Item $ZIPFILE -Force -Confirm:$false -ErrorAction SilentlyContinue
 
 Write-Host "🗜 Creating ZIP..."
-Compress-Archive -Path server.js,package.json,public,package-lock.json -DestinationPath $ZIPFILE -Force
+Compress-Archive -Path server.js,package.json,public,package-lock.json,web.config -DestinationPath $ZIPFILE -Force
 
 Write-Host "☁ Deploying to Azure..."
 az webapp deployment source config-zip `
