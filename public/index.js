@@ -11,6 +11,26 @@ const loginBtnModal = document.getElementById("modal-login-btn");
 const registerBtnModal = document.getElementById("modal-register-btn");
 const loginErrorModal = document.getElementById("modal-login-error");
 const registerErrorModal = document.getElementById("modal-register-error");
+const loadingOverlay = document.getElementById("loading-overlay");
+
+async function waitForServerReady() {
+  while (true) {
+    try {
+      const res = await fetch("/api/auth/me", { credentials: "include" });
+
+      if (res.status === 200 || res.status === 401) {
+        loadingOverlay.style.display = "none";
+        return;
+      }
+    } catch (err) {
+      console.log("Server not ready yet…");
+    }
+
+    await new Promise((r) => setTimeout(r, 1000));
+  }
+}
+
+waitForServerReady();
 
 async function apiFetch(url, options = {}) {
   showSpinner();
@@ -64,9 +84,7 @@ async function checkAuthAndUpdateNav() {
     authLink.onclick = async (e) => {
       e.preventDefault();
       try {
-        await apiFetch("/api/auth/logout", {
-          method: "POST",
-        });
+        await apiFetch("/api/auth/logout", { method: "POST" });
       } catch {}
       authLink.textContent = "Sign In";
       authLink.onclick = (ev) => {
