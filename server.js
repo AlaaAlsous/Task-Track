@@ -1,55 +1,50 @@
-import express from "express";
-import session from "express-session";
-import bcryptjs from "bcryptjs";
-import sql from "mssql";
-import dotenv from "dotenv";
-import cookieParser from "cookie-parser";
-import crypto from "crypto";
+const express = require("express");
+const session = require("express-session");
+const bcryptjs = require("bcryptjs");
+const sql = require("mssql");
+const dotenv = require("dotenv");
+const cookieParser = require("cookie-parser");
+const crypto = require("crypto");
 
 dotenv.config();
 
-let sessionSecret = process.env.SESSIONSECRET;
-let sqlConnectionString = process.env.SqlConnectionString;
+const sessionSecret = process.env.SESSIONSECRET;
+const sqlConnectionString = process.env.SQL_CONNECTION_STRING;
 
-let db;
+if (!sessionSecret) {
+  throw new Error("SESSIONSECRET is missing");
+}
 
-async function loadSecretsAndStart() {
-  if (sessionSecret && sqlConnectionString) {
-    console.log("Running locally with .env secrets");
+if (!sqlConnectionString) {
+  throw new Error("SQL_CONNECTION_STRING is missing");
+}
+
+let db = null;
+let sqlReady = false;
+
+startServer();
+
+initializeBackgroundStartup();
+
+async function initializeBackgroundStartup() {
+  try {
+    if (!sessionSecret || !sqlConnectionString) {
+      console.error(
+        "Missing SESSIONSECRET or SqlConnectionString in App Settings",
+      );
+      return;
+    }
+
     await connectToSql();
-    startServer();
-    return;
+  } catch (err) {
+    console.error("Startup error:", err);
   }
-
-  console.log("Loading secrets from Azure Key Vault...");
-  const keyVaultName = "kv-task-track";
-
-  const { DefaultAzureCredential } = await import("@azure/identity");
-  const { SecretClient } = await import("@azure/keyvault-secrets");
-
-  const credential = new DefaultAzureCredential();
-  const client = new SecretClient(
-    `https://${keyVaultName}.vault.azure.net`,
-    credential,
-  );
-
-  const sessionSecretObj = await client.getSecret("SESSIONSECRET");
-  const sqlSecretObj = await client.getSecret("SqlConnectionString");
-
-  if (!sessionSecretObj.value || !sqlSecretObj.value) {
-    throw new Error("Missing required secrets in Key Vault");
-  }
-
-  sessionSecret = sessionSecretObj.value;
-  sqlConnectionString = sqlSecretObj.value;
-
-  await connectToSql();
-  startServer();
 }
 
 async function connectToSql() {
   try {
     db = await sql.connect(sqlConnectionString);
+    sqlReady = true;
     console.log("Connected to Azure SQL!");
 
     await db.request().query(`
@@ -159,7 +154,7 @@ function startServer() {
   });
 
   app.listen(port, () => {
-    console.log(`Listening on port ${port}`);
+    console.log(`http://localhost:${port}`);
   });
 }
 
@@ -510,5 +505,3 @@ async function deleteTask(req, res) {
       .json({ error: "Internal server error. Please try again later." });
   }
 }
-
-loadSecretsAndStart();
