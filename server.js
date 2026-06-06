@@ -22,31 +22,39 @@ if (!sqlConnectionString) {
 let db = null;
 let sqlReady = false;
 
-startServer();
+main();
 
-initializeBackgroundStartup();
-
-async function initializeBackgroundStartup() {
+async function main() {
   try {
     if (!sessionSecret || !sqlConnectionString) {
-      console.error(
-        "Missing SESSIONSECRET or SqlConnectionString in App Settings",
-      );
-      return;
+      console.error("Missing SESSIONSECRET or SQL_CONNECTION_STRING");
+      process.exit(1);
     }
 
-    await connectToSql();
+    for (let i = 1; i <= 5; i++) {
+      try {
+        console.log(`Connecting to Azure SQL (attempt ${i}/5)...`);
+        db = await sql.connect(sqlConnectionString);
+        sqlReady = true;
+        console.log("✓ Connected to Azure SQL!");
+        await initializeDatabase();
+        break;
+      } catch (err) {
+        console.error(`Connection failed:`, err.message);
+        if (i === 5) throw err;
+        await new Promise((r) => setTimeout(r, 5000));
+      }
+    }
+
+    startServer();
   } catch (err) {
-    console.error("Startup error:", err);
+    console.error("Failed to start:", err.message);
+    process.exit(1);
   }
 }
 
-async function connectToSql() {
+async function initializeDatabase() {
   try {
-    db = await sql.connect(sqlConnectionString);
-    sqlReady = true;
-    console.log("Connected to Azure SQL!");
-
     await db.request().query(`
       IF NOT EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = 'users')
       CREATE TABLE users (
@@ -76,9 +84,10 @@ async function connectToSql() {
         FOREIGN KEY (userId) REFERENCES users(id) ON DELETE CASCADE
       );
     `);
+    console.log("✓ Database schema initialized");
   } catch (err) {
-    console.error("SQL connection failed:", err);
-    throw new Error("Could not connect to SQL: " + err.message);
+    console.error("Database initialization error:", err);
+    throw err;
   }
 }
 
@@ -93,6 +102,14 @@ function startServer() {
   app.use(express.json());
   app.use(cookieParser());
   app.set("trust proxy", 1);
+
+  app.get("/health", (req, res) => {
+    if (sqlReady) {
+      res.status(200).json({ status: "healthy", database: "connected" });
+    } else {
+      res.status(503).json({ status: "unhealthy", database: "disconnected" });
+    }
+  });
 
   app.use(
     session({
@@ -111,6 +128,12 @@ function startServer() {
 
   app.use(async (req, res, next) => {
     try {
+      if (!sqlReady || !db) {
+        return res
+          .status(503)
+          .json({ error: "Service unavailable. Database connection pending." });
+      }
+
       if (req.session.userId) return next();
 
       const token = req.cookies?.rememberMe;
@@ -130,7 +153,8 @@ function startServer() {
 
       req.session.userId = row.userId;
       next();
-    } catch {
+    } catch (err) {
+      console.error("Session middleware error:", err);
       next();
     }
   });

@@ -72,7 +72,7 @@ För att köra projektet lokalt måste du skapa en `.env`-fil i projektroten med
 
 ```env
 SESSIONSECRET=din-super-hemliga-sträng
-SqlConnectionString=Server=tcp:task-track-server.database.windows.net,1433;Initial Catalog=Task-Track-DB;Persist Security Info=False;User ID=Task-Track-Admin;Password=DITT_LÖSENORD;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;
+SQL_CONNECTION_STRING=Server=tcp:task-track-server.database.windows.net,1433;Initial Catalog=Task-Track-DB;Persist Security Info=False;User ID=Task-Track-Admin;Password=DITT_LÖSENORD;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;
 ```
 
 Byt ut värdena mot dina egna. Dessa variabler krävs för att backend ska starta lokalt.
@@ -94,7 +94,7 @@ npm start
 **Deploy to Azure Web App:**
 
 1. Se till att Azure-resurser är skapade: SQL Database, Key Vault (`kv-task-track`), och Web App.
-2. Lägg in hemligheterna `SESSIONSECRET` och `SqlConnectionString` i Key Vault.
+2. Lägg in hemligheterna `SESSIONSECRET` och `SQL_CONNECTION_STRING` i Key Vault.
 3. Kör deploymentscriptet:
 
 ```powershell
