@@ -5,7 +5,6 @@
 ![Express](https://img.shields.io/badge/Express-000000?logo=express&logoColor=white)
 ![Azure](https://img.shields.io/badge/Azure-0078D4?logo=microsoftazure&logoColor=white)
 ![Azure SQL](https://img.shields.io/badge/Azure%20SQL-0089D6?logo=microsoftsqlserver&logoColor=white)
-![Key Vault](https://img.shields.io/badge/Key%20Vault-4B53BC?logo=microsoftazure&logoColor=white)
 ![HTML5](https://img.shields.io/badge/HTML5-E34F26?logo=html5&logoColor=white)
 ![CSS3](https://img.shields.io/badge/CSS3-1572B6?logo=css3&logoColor=white)
 ![VS Code](https://img.shields.io/badge/VS%20Code-007ACC?logo=visualstudiocode&logoColor=white)
@@ -27,7 +26,7 @@ Task Track är en komplett fullstack-applikation för att hantera personliga upp
 **Arkitektur och Azure-integration:**
 
 - **Databas:** Alla användare och uppgifter lagras i en Azure SQL Database istället för lokala JSON-filer.
-- **Key Vault:** Hemligheter som `SESSIONSECRET` och `SqlConnectionString` hämtas säkert från Azure Key Vault (`kv-task-track`).
+- **Miljövariabler:** Hemligheter som `SESSIONSECRET` och `SQL_CONNECTION_STRING` läses från applikationens miljövariabler (Azure Web App App Settings eller lokal `.env`-fil).
 - **Deployment:** Applikationen är anpassad för Azure Web App och kan deployas automatiskt med `Deploy.ps1` (PowerShell-script) som zippar och laddar upp koden.
 - **Sessions:** Sessionscookies används för autentisering. API:t är uppdelat i auth-endpoints och tasks-endpoints. Frontenden kommunicerar med API:t via fetch-anrop och renderar listor, formulär och notifieringar direkt i DOM.
 
@@ -64,7 +63,7 @@ Task-Track/
 
 ## English Summary
 
-Task Track is a `Node.js` and `Express` app with a static frontend. Users can register/login, then create, edit, delete and mark tasks as done. All data is stored in Azure SQL Database. Secrets are managed via Azure Key Vault.
+Task Track is a `Node.js` and `Express` app with a static frontend. Users can register/login, then create, edit, delete and mark tasks as done. All data is stored in Azure SQL Database. Secrets are managed via environment variables (App Settings in Azure Web App or a local `.env` file).
 
 ## Lokal utveckling
 
@@ -93,8 +92,10 @@ npm start
 
 **Deploy to Azure Web App:**
 
-1. Se till att Azure-resurser är skapade: SQL Database, Key Vault (`kv-task-track`), och Web App.
-2. Lägg in hemligheterna `SESSIONSECRET` och `SQL_CONNECTION_STRING` i Key Vault.
+1. Se till att Azure-resurser är skapade: SQL Database och Web App.
+2. Ställ in följande App Settings (miljövariabler) i Azure Web App:
+   - `SESSIONSECRET` – din hemliga sessionsnyckel
+   - `SQL_CONNECTION_STRING` – anslutningssträngen till Azure SQL Database
 3. Kör deploymentscriptet:
 
 ```powershell
@@ -198,6 +199,6 @@ Alaa Alsous
 - Språk: JavaScript
 - Plattform: Node.js / Express; Frontend: HTML/CSS/JS
 - Databas: Azure SQL Database
-- Hemligheter: Azure Key Vault
+- Hemligheter: Azure Web App App Settings (miljövariabler)
 - Deployment: Azure Web App, PowerShell (Deploy.ps1)
 - Verktyg: VS Code, Nodemon
