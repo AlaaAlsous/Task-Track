@@ -14,20 +14,43 @@ const registerErrorModal = document.getElementById("modal-register-error");
 const loadingOverlay = document.getElementById("loading-overlay");
 
 async function waitForServerReady() {
-  while (true) {
-    try {
-      const res = await fetch("/api/auth/me", { credentials: "include" });
+  const maxAttempts = 120;
+  let attempts = 0;
+  const statusEl = document.getElementById("loading-status");
 
-      if (res.status === 200 || res.status === 401) {
-        loadingOverlay.style.display = "none";
+  while (attempts < maxAttempts) {
+    try {
+      const res = await fetch("/health", { credentials: "include" });
+
+      if (res.status === 200) {
+        const data = await res.json();
+        if (data.database === "connected") {
+          console.log("✓ Server and database are ready!");
+          statusEl.textContent = "Loading...";
+          hideSpinner();
+          return;
+        } else {
+          statusEl.textContent = "Connecting to database...";
+        }
+      } else if (res.status === 503) {
+        statusEl.textContent = "Database connection pending...";
+      } else if (res.status === 401) {
+        console.log("✓ Server is responding!");
+        hideSpinner();
         return;
       }
     } catch (err) {
-      console.log("Server not ready yet…");
+      statusEl.textContent = `Waiting for server... (${attempts + 1}/${maxAttempts})`;
+      console.log(`Server not ready yet (${attempts + 1}/${maxAttempts})…`);
     }
 
+    attempts++;
     await new Promise((r) => setTimeout(r, 1000));
   }
+
+  console.error("⚠ Server startup timeout after 120 seconds");
+  statusEl.textContent = "Server not responding. Please refresh the page.";
+  setTimeout(() => hideSpinner(), 5000);
 }
 
 waitForServerReady();
@@ -262,14 +285,14 @@ async function loadTasks() {
           if (isDone) {
             listItem.classList.add("done-task");
             setTimeout(() => {
-              showNotification("✅ Task Completed!");
               loadTasks();
+              showNotification("✅ Task Completed!");
             }, 500);
           } else {
             listItem.classList.add("undone-task");
             setTimeout(() => {
-              showNotification("❌ Task Unchecked!");
               loadTasks();
+              showNotification("❌ Task Unchecked!");
             }, 500);
           }
         } catch {
@@ -300,8 +323,8 @@ async function loadTasks() {
             listItem.classList.add("remove-task");
             setTimeout(() => {
               listItem.remove();
-              showNotification("❌ Task Deleted!");
               loadTasks();
+              showNotification("❌ Task Deleted!");
             }, 500);
           } catch {
             alert("Could not delete task. Please try again.");
@@ -641,7 +664,7 @@ function showNotification(message) {
   notification.classList.remove("hide-notification");
   setTimeout(() => {
     notification.classList.add("hide-notification");
-  }, 1500);
+  }, 3000);
 }
 
 function handleEnterConfirmBtn(e, confirmBtn) {
