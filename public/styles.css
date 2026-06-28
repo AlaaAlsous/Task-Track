@@ -964,7 +964,7 @@ main {
   }
 }
 
-@media (max-width: 768px) {
+@media (max-width: 900px) {
   .task-list ul {
     padding: 0;
   }
@@ -997,6 +997,11 @@ main {
   .editBtn {
     order: 7;
   }
+  .saveBtn,
+  .cancelBtn {
+    order: 9;
+  }
+
   .task-counts {
     margin: auto;
     gap: 0.5rem;
@@ -1018,7 +1023,7 @@ main {
   }
 }
 
-@media (max-width: 480px) {
+@media (max-width: 600px) {
   .task-list ul {
     padding: 0;
   }
@@ -1050,6 +1055,10 @@ main {
   }
   .editBtn {
     order: 7;
+  }
+  .saveBtn,
+  .cancelBtn {
+    order: 9;
   }
   .task-id {
     order: 2;

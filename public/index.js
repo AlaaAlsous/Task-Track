@@ -53,8 +53,6 @@ async function waitForServerReady() {
   setTimeout(() => hideSpinner(), 5000);
 }
 
-waitForServerReady();
-
 async function apiFetch(url, options = {}) {
   showSpinner();
 
@@ -71,6 +69,11 @@ async function apiFetch(url, options = {}) {
     throw err;
   }
 }
+
+waitForServerReady().then(() => {
+  checkAuthAndUpdateNav();
+  loadTasks();
+});
 
 function openAuthModal(mode = "login") {
   if (mode === "login") {
@@ -458,8 +461,6 @@ async function loadTasks() {
   }
 }
 
-loadTasks();
-
 async function doLoginModal() {
   loginErrorModal.textContent = "";
 
@@ -555,8 +556,6 @@ if (loginUsernameInput && loginPasswordInput && loginBtnModal) {
     });
   });
 }
-
-checkAuthAndUpdateNav();
 
 const taskTextInput = document.getElementById("new-task");
 const priorityInput = document.getElementById("priority");
